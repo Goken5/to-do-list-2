@@ -3,14 +3,17 @@ import { Login } from "../components/LoginDiv"
 
 export default function MainPage(){
     return(
-        <div className="flex flex-col min-h-screen min-w-screen">
-            <Header />
-            <div className="flex h-full justify-bottom flex-1 flex-row mt-[50px] mb-[50px] pr-[100px] justify-end">
-                <div className="w-[40vw] flex justify-center items-center text-center">
-                    <Login />   
-                </div>
-            </div>
-            <Footer />
+      <div className="flex flex-col min-h-screen">
+        <Header />
+  
+        <div className="flex flex-1 justify-center items-center px-4 sm:px-[100px]">
+          
+          <div className="w-[90vw] sm:w-[40vw] sm:flex-row flex flex-col-reverse sm:justify-end justify-center items-center text-center">
+            <Login />
+          </div>
         </div>
+  
+        <Footer />
+      </div>
     )
-}
+  }
