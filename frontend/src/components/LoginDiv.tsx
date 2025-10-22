@@ -1,19 +1,30 @@
-import { useState } from "react"
+import { useNavigate } from "react-router-dom";
+import Input from "./Input"
 
 type dados = {
     nome: string;
     email: string;
     senha: string;
 }
-export default function Login(){
+export function Login(){
+    const navigate = useNavigate();
     return(
-        <form className=" text-center justify-center border-blue-600 bg-blue-300 p-5 rounded-3xl  ">
-            <label htmlFor="email" className="block text-black">Email:</label>
-            <input type="text" className="block text-black border-black border-1 transition-all focus:scale-105 focus:border-2 bg-neutral-50 rounded-2xl w-full"/>
-            <label htmlFor="nome" className="block text-black">Nome</label>
-            <input type="text" className="block text-black border-black border-1 transition-all focus:scale-105 focus:border-2 bg-neutral-50 rounded-2xl w-full"/>
-            <label htmlFor="nome" className="block text-black">Senha</label>
-            <input type="password" className="block text-black border-black border-1 transition-all focus:scale-105 focus:border-2 bg-neutral-50 rounded-2xl w-full"/>
+        <form className=" flex flex-col text-center justify-center border-blue-600 bg-blue-300 w-[45vw] h-[70vh] rounded-3xl items-center">
+            <h1 className="text-4xl text-white font-bold mb-5">Bem Vindo!</h1>
+            <h2 className="text-3xl text-white font-bold mb-5">Faça Login no To-do List</h2>
+            <Input type="email" placeholder="E-mail"/>
+            <Input type="password" placeholder="Senha"/>
+            <p className="text-white text-2xl">Novo por aqui?</p> <button className="text-white underline transition-all hover:scale-110 hover:cursor-pointer" onClick={() => navigate('/registro')}>Registre-se</button>
+        </form>
+    )
+}
+export function Registro(){
+    return(
+        <form className="text-center justify-center border-blue-600 bg-blue-300 rounded-3xl">
+            <Input type="text" placeholder="Nome"/>
+            <Input type="email" placeholder="E-mail"/>
+            <Input type="password" placeholder="Senha" />
+            <Input type="passoword" placeholder="Confirmar Senha" />
         </form>
     )
 }
