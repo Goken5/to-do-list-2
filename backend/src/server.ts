@@ -10,8 +10,9 @@ app.get("/", (req: Request, res: Response) => {
 })
 app.post("/register", (req: Request, res: Response) => {
     const { nome, email, senha } = req.body;
+    console.log(nome, email, senha);
 
-    res.json({message: "Usuário Registrado"});
+    res.json({nome: nome, email: email, senha: senha});
 } )
 app.listen(8000, () => {
     console.log("Servidor rodando na porta 8000");

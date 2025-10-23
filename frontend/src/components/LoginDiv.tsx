@@ -34,18 +34,19 @@ export function SignUp(){
     const [confirmar, setConfirmar] = useState("");
     const [error, setError] = useState("");
 
-    const handleClick = async(e: FormEvent) => {
+    const handleClick = async (e: FormEvent) => {
         e.preventDefault()
         if(senha != confirmar){
             alert("As senhas não coincidem");
             return;
         }
-        console.log("Recebi os crias:\nnome:", nome, "\nemail:", email, "\nsenha:", senha, "\nconfirmar:", confirmar);
-        await axios.post("http://localhost:8000/register", {
+        const data = await axios.post("http://localhost:8000/register", {
             "nome": nome, 
             "email": email,
-            "senha": senha,
+            "senha": senha
         });
+        // console.log("Recebi os crias:\nnome:", nome, "\nemail:", email, "\nsenha:", senha, "\nconfirmar:", confirmar);
+        console.log(data)
     }
 
     return(
