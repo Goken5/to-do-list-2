@@ -32,6 +32,7 @@ export function SignUp(){
     return(
         <form className=" flex flex-col text-center justify-center border-blue-600 border-2 bg-blue-300 sm:w-[70vw] w-[90vw] h-[70vh] rounded-3xl items-center">
             <h1 className="text-4xl text-white font-bold mb-5">Registre-se no To-do List</h1>
+            <h2 className="text-3xl text-white font-semibold mb-10">Registre-se no To-do List e comece a organizar suas ideias <strong>hoje</strong></h2>
             <Input type="text" placeholder="Nome"/>
             <Input type="email" placeholder="E-mail"/>
             <Input type="password" placeholder="Senha" />
