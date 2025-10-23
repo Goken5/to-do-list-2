@@ -40,8 +40,8 @@ export function SignUp(){
             alert("As senhas não coincidem");
             return;
         }
-        console.log("Recebi os crias: " + nome + email + senha + confirmar);
-        await axios.post("http://localhost:8000", {
+        console.log("Recebi os crias:\nnome:", nome, "\nemail:", email, "\nsenha:", senha, "\nconfirmar:", confirmar);
+        await axios.post("http://localhost:8000/register", {
             "nome": nome, 
             "email": email,
             "senha": senha,
@@ -49,7 +49,7 @@ export function SignUp(){
     }
 
     return(
-        <form className=" flex flex-col text-center justify-center border-blue-600 border-2 bg-blue-300 sm:w-[70vw] w-[90vw] h-[70vh] rounded-3xl items-center">
+        <form onSubmit={handleClick} className=" flex flex-col text-center justify-center border-blue-600 border-2 bg-blue-300 sm:w-[70vw] w-[90vw] h-[70vh] rounded-3xl items-center">
             <h1 className="text-4xl text-white font-bold mb-5">Registre-se no To-do List</h1>
             <h2 className="text-3xl text-white font-semibold mb-10">Registre-se no To-do List e comece a organizar suas ideias <strong>hoje</strong></h2>
             <Input type="text" placeholder="Nome" onChange={(e) => setNome(e.target.value)}/>
@@ -61,7 +61,7 @@ export function SignUp(){
               hover:scale-110 hover:cursor-pointer transition-all
             text-white hover:text-black hover:shadow-2xl
             hover:shadow-black mb-3"
-            onClick={handleClick}>Registrar</button>
+            >Registrar</button>
         </form>
     )
 }
