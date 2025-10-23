@@ -14,6 +14,11 @@ export function Login(){
             <h2 className="text-3xl text-white font-bold mb-10">Faça Login no To-do List</h2>
             <Input type="email" placeholder="E-mail"/>
             <Input type="password" placeholder="Senha"/>
+            <button type="submit" className="
+            bg-blue-900 rounded-4xl border-black border-2 p-3 pr-20 pl-20
+              hover:scale-110 hover:cursor-pointer transition-all
+            text-white hover:text-black hover:shadow-2xl
+            hover:shadow-black mb-3">Login</button>
             <p className="text-white text-2xl">Novo por aqui?</p> <button className="text-white underline transition-all hover:scale-110 hover:cursor-pointer" onClick={() => navigate('/registro')}>Registre-se</button>
         </form>
     )
