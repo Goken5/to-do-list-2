@@ -3,16 +3,26 @@ import { useState, type FormEvent } from "react";
 import Input from "./Input"
 import axios from "axios";
 
-
 export function Login(){
     const navigate = useNavigate();
+    const [email, setEmail] = useState("");
+    const [senha, setSenha] = useState("");
     
-    return(
-        <form className=" flex flex-col text-center justify-center border-blue-600 border-2 bg-blue-300 sm:w-[40vw] w-[90vw] h-[70vh] rounded-3xl items-center ">
+    const handleClick = async(e: FormEvent) => {
+        e.preventDefault()
+        const data = await axios.post(`http://localhost:8000/login`, {
+            "email": email,
+            "senha": senha
+        })
+        console.log(data)
+    }
+    
+    return( 
+        <form onSubmit={handleClick} className=" flex flex-col text-center justify-center border-blue-600 border-2 bg-blue-300 sm:w-[40vw] w-[90vw] h-[70vh] rounded-3xl items-center ">
             <h1 className="text-4xl text-white font-bold mb-5">Bem Vindo!</h1>
             <h2 className="text-3xl text-white font-bold mb-10">Faça Login no To-do List</h2>
-            <Input type="email" placeholder="E-mail"/>
-            <Input type="password" placeholder="Senha"/>
+            <Input type="email" placeholder="E-mail" onChange={(e) => setEmail(e.target.value)}/>
+            <Input type="password" placeholder="Senha" onChange={(e) => setSenha(e.target.value)}/>
             <button type="submit" className="
             bg-blue-700 rounded-4xl border-black border-2 p-3 pr-20 pl-20
               hover:scale-110 hover:cursor-pointer transition-all
@@ -28,11 +38,11 @@ export function Login(){
     )
 }
 export function SignUp(){
+    // const navigate = useNavigate();
     const [nome, setNome] = useState("");
     const [email, setEmail] = useState("");
     const [senha, setSenha] = useState("");
     const [confirmar, setConfirmar] = useState("");
-    const [error, setError] = useState("");
 
     const handleClick = async (e: FormEvent) => {
         e.preventDefault()
@@ -45,7 +55,6 @@ export function SignUp(){
             "email": email,
             "senha": senha
         });
-        // console.log("Recebi os crias:\nnome:", nome, "\nemail:", email, "\nsenha:", senha, "\nconfirmar:", confirmar);
         console.log(data)
     }
 
