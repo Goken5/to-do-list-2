@@ -15,21 +15,32 @@ export function Login(){
             <Input type="email" placeholder="E-mail"/>
             <Input type="password" placeholder="Senha"/>
             <button type="submit" className="
-            bg-blue-900 rounded-4xl border-black border-2 p-3 pr-20 pl-20
+            bg-blue-700 rounded-4xl border-black border-2 p-3 pr-20 pl-20
               hover:scale-110 hover:cursor-pointer transition-all
             text-white hover:text-black hover:shadow-2xl
             hover:shadow-black mb-3">Login</button>
-            <p className="text-white text-2xl">Novo por aqui?</p> <button className="text-white underline transition-all hover:scale-110 hover:cursor-pointer" onClick={() => navigate('/registro')}>Registre-se</button>
+            <div className="flex items-center gap-2 text-white text-2xl">
+            <p>Não tem uma conta ainda?</p>
+             <button className=" underline transition-all hover:scale-110 hover:cursor-pointer"
+              onClick={() => navigate('/register')}>Registre-se</button>
+            </div>
+            
         </form>
     )
 }
-export function Registro(){
+export function SignUp(){
     return(
-        <form className="text-center justify-center border-blue-600 bg-blue-300 rounded-3xl">
+        <form className=" flex flex-col text-center justify-center border-blue-600 border-2 bg-blue-300 sm:w-[70vw] w-[90vw] h-[70vh] rounded-3xl items-center">
+            <h1 className="text-4xl text-white font-bold mb-5">Registre-se no To-do List</h1>
             <Input type="text" placeholder="Nome"/>
             <Input type="email" placeholder="E-mail"/>
             <Input type="password" placeholder="Senha" />
             <Input type="passoword" placeholder="Confirmar Senha" />
+            <button type="submit" className="
+            bg-blue-700 rounded-4xl border-black border-2 p-3 pr-20 pl-20
+              hover:scale-110 hover:cursor-pointer transition-all
+            text-white hover:text-black hover:shadow-2xl
+            hover:shadow-black mb-3">Registrar</button>
         </form>
     )
 }
