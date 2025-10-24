@@ -9,6 +9,7 @@ export interface User {
     nome: string;
     itens: string[];
     userEmail: string;
+    descricao: string;
   }
   
   export const users: User[] = [];

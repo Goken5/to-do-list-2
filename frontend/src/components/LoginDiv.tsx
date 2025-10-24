@@ -19,13 +19,13 @@ export function Login(){
     }
     
     return( 
-        <form onSubmit={handleClick} className=" flex flex-col text-center justify-center border-blue-600 border-2 bg-blue-300 sm:w-[40vw] w-[90vw] h-[70vh] rounded-3xl items-center ">
+        <form onSubmit={handleClick} className=" flex flex-col text-center justify-center border-blue-600 border-2 bg-blue-300 xl:w-[40vw] w-[90vw] h-[70vh] rounded-3xl items-center ">
             <h1 className="text-4xl text-white font-bold mb-5">Bem Vindo!</h1>
             <h2 className="text-3xl text-white font-bold mb-10">Faça Login no To-do List</h2>
             <Input type="email" placeholder="E-mail" onChange={(e) => setEmail(e.target.value)}/>
             <Input type="password" placeholder="Senha" onChange={(e) => setSenha(e.target.value)}/>
             <Button type="submit">Login</Button>
-            <div className="flex items-center gap-2 text-white text-2xl">
+            <div className="flex items-center gap-2 text-white text-2xl flex-col xl:flex-row">
             <p>Não tem uma conta ainda?</p>
              <button className="underline transition-all hover:scale-110 hover:cursor-pointer"
               onClick={() => navigate('/register')}>Registre-se</button>
@@ -58,7 +58,7 @@ export function SignUp(){
     }
 
     return(
-        <form onSubmit={handleClick} className=" flex flex-col text-center justify-center border-blue-600 border-2 bg-blue-300 sm:w-[70vw] w-[90vw] h-[70vh] rounded-3xl items-center">
+        <form onSubmit={handleClick} className=" flex flex-col text-center justify-center border-blue-600 border-2 bg-blue-300 xl:w-[50vw] w-[90vw] h-[70vh] rounded-3xl items-center">
             <h1 className="text-4xl text-white font-bold mb-5">Registre-se no To-do List</h1>
             <h2 className="text-3xl text-white font-semibold mb-10">Registre-se no To-do List e comece a organizar suas ideias <strong>hoje</strong></h2>
             <Input type="text" placeholder="Nome" onChange={(e) => setNome(e.target.value)}/>

@@ -1,4 +1,7 @@
 import { useNavigate } from "react-router-dom"
+import { useState } from "react";
+import axios from "axios";
+
 import { Input, Button } from "./Input";
 
 interface ListDivProps {
@@ -25,6 +28,17 @@ export function ListDiv({ CreateList } : ListDivProps){
 }
 
 export function CreateListDiv(){
+    const [nome, setNome] = useState("");
+    const [descricao, setDescricao] = useState("");
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        const data = await axios.post("http://localhost:8000/lists", {
+            "nome": nome,
+            "descricao": descricao,
+        })
+        console.log(data);
+    }
     return(
         <div className="flex flex-col text-center justify-center items-center
             border-blue-600 border-2 bg-blue-300
@@ -34,9 +48,10 @@ export function CreateListDiv(){
                 Crie sua Lista
             </h1>
 
-            <form className="flex flex-col w-full items-center">
-                <Input type="text" placeholder="Nome da Lista (ex: lista de compras)" />
-                <Input type="text" placeholder="Descrição da Lista" />
+            <form className="flex flex-col w-full items-center" onSubmit={handleSubmit}>
+                <Input type="text" placeholder="Nome da Lista (ex: lista de compras)" onChange={(e) => setNome(e.target.value)}/>
+                <Input type="text" placeholder="Descrição da Lista" onChange={(e) => setDescricao(e.target.value)} />
+                <Button >Criar Opção</Button>
                 <Button type="submit">Criar Lista</Button>
             </form>
         </div>
