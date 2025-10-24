@@ -1,8 +1,9 @@
 import React from "react";
 
 type InputProps = React.InputHTMLAttributes<HTMLInputElement>;
+type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement>;
 
-export default function Input({ ...props }: InputProps) {
+export function Input({ ...props }: InputProps) {
   return (
     <input
       {...props}
@@ -12,4 +13,17 @@ export default function Input({ ...props }: InputProps) {
       hover:cursor-text border border-solid m-3"
     />
   );
+}
+export function Button({ children, ...props}: ButtonProps) {
+  return (
+    <button
+      {...props}
+      className="bg-blue-700 rounded-3xl border-black border-2 py-3 px-10
+        hover:scale-110 hover:cursor-pointer transition-all
+        text-white font-medium hover:text-black hover:shadow-2xl
+        hover:shadow-black mb-3 w-fit sm:w-auto"
+    >
+      {children}
+    </button>
+  )
 }

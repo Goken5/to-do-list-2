@@ -1,6 +1,7 @@
 @import 'tailwindcss';
 
 head, body{
+  overflow-x: hidden;
   overflow: auto;
   margin: 0;
   padding: 0;

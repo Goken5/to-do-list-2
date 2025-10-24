@@ -1,25 +1,48 @@
 import { useNavigate } from "react-router-dom"
+import { Input, Button } from "./Input";
 
-export function CreateList(){
+interface ListDivProps {
+    CreateList: () => void;
+}
+export function ListDiv({ CreateList } : ListDivProps){
     const navigate = useNavigate();
 
     return(
-        <div className="flex flex-col text-center justify-center border-blue-600 border-2 bg-blue-300 sm:w-[60vw] sm:h-[60vh] w-[90vw] h-[50vh] rounded-3xl items-center">
-            <h1 className="text-4xl text-white font-semibold m-10">Crie sua Lista</h1>
-            <button className="
-            bg-blue-700 rounded-4xl border-black border-2 p-3 pr-20 pl-20
-            hover:scale-110 hover:cursor-pointer transition-all
-            text-white hover:text-black hover:shadow-2xl
-            hover:shadow-black mb-3">Criar uma nova Lista</button>
-            <button className="
-            bg-blue-700 rounded-4xl border-black border-2 p-3 pr-20 pl-20
-            hover:scale-110 hover:cursor-pointer transition-all
-            text-white hover:text-black hover:shadow-2xl
-            hover:shadow-black mb-3"
-            onClick={() => navigate("/lists")}>Visualizar suas Listas</button>
+        <div className="flex flex-col text-center justify-center items-center
+        border-blue-600 border-2 bg-blue-300
+        w-[90vw] max-w-[700px] rounded-3xl p-6 mt-6">
+                
+            <h1 className="text-3xl sm:text-4xl text-white font-semibold mb-6">
+                Sobre suas Listas
+            </h1>
+
+            <div className="flex flex-col gap-3 w-full items-center">
+                <Button onClick={CreateList}>Criar uma nova Lista</Button>
+                <Button onClick={() => navigate("/lists")}>Visualizar suas Listas</Button>
+            </div>
         </div>
     )
 }
+
+export function CreateListDiv(){
+    return(
+        <div className="flex flex-col text-center justify-center items-center
+            border-blue-600 border-2 bg-blue-300
+            w-[90vw] max-w-[700px] rounded-3xl p-6 mt-6">
+
+            <h1 className="text-2xl sm:text-3xl text-white font-semibold mb-4">
+                Crie sua Lista
+            </h1>
+
+            <form className="flex flex-col w-full items-center">
+                <Input type="text" placeholder="Nome da Lista (ex: lista de compras)" />
+                <Input type="text" placeholder="Descrição da Lista" />
+                <Button type="submit">Criar Lista</Button>
+            </form>
+        </div>
+    )
+}
+
 
 export function ViewList(){
 

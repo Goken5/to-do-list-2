@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useState, type FormEvent } from "react";
-import Input from "./Input"
+import { Input, Button } from "./Input"
 import axios from "axios";
 
 export function Login(){
@@ -24,14 +24,10 @@ export function Login(){
             <h2 className="text-3xl text-white font-bold mb-10">Faça Login no To-do List</h2>
             <Input type="email" placeholder="E-mail" onChange={(e) => setEmail(e.target.value)}/>
             <Input type="password" placeholder="Senha" onChange={(e) => setSenha(e.target.value)}/>
-            <button type="submit" className="
-            bg-blue-700 rounded-4xl border-black border-2 p-3 pr-20 pl-20
-              hover:scale-110 hover:cursor-pointer transition-all
-            text-white hover:text-black hover:shadow-2xl
-            hover:shadow-black mb-3">Login</button>
+            <Button type="submit">Login</Button>
             <div className="flex items-center gap-2 text-white text-2xl">
             <p>Não tem uma conta ainda?</p>
-             <button className=" underline transition-all hover:scale-110 hover:cursor-pointer"
+             <button className="underline transition-all hover:scale-110 hover:cursor-pointer"
               onClick={() => navigate('/register')}>Registre-se</button>
             </div>
             
@@ -69,12 +65,7 @@ export function SignUp(){
             <Input type="email" placeholder="E-mail" onChange={(e) => setEmail(e.target.value)}/>
             <Input type="password" placeholder="Senha" onChange={(e) => setSenha(e.target.value)} />
             <Input type="password" placeholder="Confirmar Senha" onChange={(e) => setConfirmar(e.target.value)}/>
-            <button type="submit" className="
-            bg-blue-700 rounded-4xl border-black border-2 p-3 pr-20 pl-20
-              hover:scale-110 hover:cursor-pointer transition-all
-            text-white hover:text-black hover:shadow-2xl
-            hover:shadow-black mb-3"
-            >Registrar</button>
+            <Button type="submit">Registrar</Button>
         </form>
     )
 }
