@@ -73,7 +73,7 @@ export function CreateListDiv() {
                     placeholder="Descrição da Lista" 
                     onChange={(e) => setDescricao(e.target.value)} 
                 />
-                <div className="flex w-full gap-2 items-center mt-2">
+                <div className="flex w-full gap-2 items-center mt-2 flex-col xl:flex-row">
                     <Input 
                         type="text" 
                         placeholder="Nova Tarefa" 
