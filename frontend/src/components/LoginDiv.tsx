@@ -10,7 +10,7 @@ export function Login(){
     
     const handleClick = async(e: FormEvent) => {
         e.preventDefault()
-        const data = await axios.post(`http://localhost:8000/login`, {
+        const data = await axios.post(`http://localhost:8000/users/login`, {
             "email": email,
             "senha": senha
         })
@@ -50,7 +50,7 @@ export function SignUp(){
             alert("As senhas não coincidem");
             return;
         }
-        const data = await axios.post("http://localhost:8000/register", {
+        const data = await axios.post("http://localhost:8000/users/register", {
             "nome": nome, 
             "email": email,
             "senha": senha

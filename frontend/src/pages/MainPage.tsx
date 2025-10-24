@@ -1,5 +1,5 @@
 import { Header, Footer } from "../components/HeaderFooter";
-import { CreateList } from "../components/CreateList";
+import { CreateList } from "../components/List";
 
 export default function MainPage(){
     return(
