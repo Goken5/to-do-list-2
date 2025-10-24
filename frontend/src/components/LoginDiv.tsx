@@ -15,6 +15,7 @@ export function Login(){
             "senha": senha
         })
         console.log(data)
+        navigate("/main")
     }
     
     return( 
@@ -38,7 +39,7 @@ export function Login(){
     )
 }
 export function SignUp(){
-    // const navigate = useNavigate();
+    const navigate = useNavigate();
     const [nome, setNome] = useState("");
     const [email, setEmail] = useState("");
     const [senha, setSenha] = useState("");
@@ -56,6 +57,8 @@ export function SignUp(){
             "senha": senha
         });
         console.log(data)
+        navigate("/main");
+        
     }
 
     return(
