@@ -1,6 +1,7 @@
 export function Header(){
+
     return(
-        <header className="fixed top-0 flex flex-col h-10 bg-blue-900 text-center w-full justify-center">
+        <header className="fixed top-0 flex flex-col h-15 bg-blue-900 text-center w-full justify-center">
             <div>
                 <h1 className="margin-5 text-white text-2xl">To-do List</h1>
             </div>

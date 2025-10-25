@@ -13,7 +13,12 @@ export function Login(){
         const data = await axios.post(`http://localhost:8000/users/login`, {
             "email": email,
             "senha": senha
-        })
+        });
+        
+        const user = data.data.user;
+        localStorage.setItem("userEmail", user.email);
+        localStorage.setItem("userName", user.nome);
+
         console.log(data)
         navigate("/main")
     }
@@ -52,7 +57,12 @@ export function SignUp(){
             "email": email,
             "senha": senha
         });
-        console.log(data)
+
+        const user = data.data.user;
+        localStorage.setItem("userEmail", user.email);
+        localStorage.setItem("userName", user.nome);
+
+        console.log(data);
         navigate("/main");
         
     }

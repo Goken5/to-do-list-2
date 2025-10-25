@@ -23,7 +23,11 @@ router.post("/login", (req: Request, res: Response) => {
   if (user.senha !== senha)
     return res.status(401).json({ message: "senha incorreta" });
 
-  return res.json({ message: "sucesso no login" });
+  return res.json({ 
+    message: "sucesso no login",
+    user: { nome: user.nome, email: user.email } 
+  });
+  
 });
 
 export default router;

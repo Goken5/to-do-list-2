@@ -5,9 +5,9 @@ export interface User {
   }
   
   export interface Lista {
-    id: number;
+    id: string;
     nome: string;
-    itens: string[];
+    tarefas: string[];
     userEmail: string;
     descricao: string;
   }

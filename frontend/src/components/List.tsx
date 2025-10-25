@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom"
 import { useState } from "react";
 import axios from "axios";
+import { v4 as uuidv4 } from "uuid";
 
 import { Input, Button } from "./Input";
 
@@ -32,13 +33,16 @@ export function CreateListDiv() {
     const [descricao, setDescricao] = useState("");
     const [tarefa, setTarefa] = useState<string[]>([]);
     const [novaTarefa, setNovaTarefa] = useState("");
+    const userEmail = localStorage.getItem("userEmail");
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         const data = await axios.post("http://localhost:8000/lists", {
+            id: uuidv4(),
             nome,
             descricao,
             tarefas: tarefa,
+            userEmail,
         });
         console.log(data);
     }
@@ -83,12 +87,12 @@ export function CreateListDiv() {
                     <Button type="button" onClick={criarTarefa}>Adicionar</Button>
                 </div>
 
-                <ul className="w-full mt-4 flex flex-col gap-2">
+                <ul className="w-full mt-4 flex flex-col gap-2 mb-4">
                     {tarefa.map((t, index) => (
                         <li key={index} className="flex justify-between items-center
                             bg-white text-black p-3 rounded-2xl border border-black shadow-md
                             hover:shadow-xl transition-shadow duration-300">
-                            <span className="font-medium">Tarefa {index + 1}: {t}</span>
+                            <span className="font-medium">{index + 1}: {t}</span>
                             <button 
                                 type="button" 
                                 className="bg-red-500 text-white px-3 py-1 rounded-full font-bold hover:scale-110 transition-transform hover:cursor-pointer"
@@ -100,7 +104,7 @@ export function CreateListDiv() {
                     ))}
                 </ul>
 
-                <Button type="submit" className="mt-5">Criar Lista</Button>
+                <Button type="submit">Criar Lista</Button>
             </form>
         </div>
     )
@@ -108,11 +112,53 @@ export function CreateListDiv() {
 
 
 
-export function ViewList(){
+export function ViewList(){ 
+    interface Lista {
+        id: string;
+        nome: string;
+        descricao: string;
+        tarefas: string[];
+        userEmail: string;
+    }
+
+    const userName = localStorage.getItem("userName");
+    const userEmail = localStorage.getItem("userEmail");
+    const [listas, setListas] = useState<Lista[]>([]);
+
+    const CarregarListas = async () => {
+        const data = await axios.get(`http://localhost:8000/lists?userEmail=${userEmail}`);
+        setListas(data.data);
+    }
+    const DeletarLista = async (id: string) => {
+        await axios.delete(`http://localhost:8000/lists/${id}`)
+        setListas(listas.filter(l => l.id !== id));
+    }
 
     return(
         <div className="flex flex-col text-center border-blue-600 border-2 bg-blue-300 sm:w-[60vw] sm:min-h-[70vh] w-[90vw] min-h-[50vh] rounded-3xl items-center">
-            <h1 className="text-4xl text-white font-semibold m-15">Suas Listas:</h1>
+            <h1 className="text-4xl text-white font-semibold m-15">Bem-vindo às suas Listas {userName}!</h1>
+            <Button onClick={CarregarListas}> Carregar Listas </Button>
+            <div className="flex flex-col gap-4 w-full mt-4">
+                {listas.map((lista) => (
+                    <div key={lista.id} className="flex flex-col xl:flex-row justify-between items-start bg-white p-4 rounded-2xl border border-black shadow-md hover:shadow-xl transition-shadow duration-300">
+                        <div className="flex flex-col gap-2">
+                            <h2 className="font-bold text-lg">{lista.nome}</h2>
+                            <p>{lista.descricao}</p>
+                            <ul className="list-disc list-inside mt-2">
+                                {lista.tarefas.map((t, i) => (
+                                    <li key={i}>{t}</li>
+                                ))}
+                            </ul>
+                        </div>
+
+                        <div className="flex gap-2 mt-2 xl:mt-0">
+                            <button 
+                                className="bg-red-500 text-white px-3 py-1 rounded-full font-bold hover:scale-110 transition-transform hover:cursor-pointer"
+                                onClick={() => DeletarLista(lista.id)}> X </button>
+                        </div>
+                    </div>
+                ))}
+            </div>
         </div>
     )
 }
