@@ -71,7 +71,7 @@ export function SignUp(){
         <form onSubmit={handleClick} className=" flex flex-col text-center justify-center border-blue-600 border-2 bg-blue-300 xl:w-[50vw] w-[90vw] h-[70vh] rounded-3xl items-center shadow-lg shadow-black/40">
             <h1 className="text-4xl text-white font-bold mb-5">Registre-se no To-do List</h1>
             <h2 className="text-3xl text-white font-semibold mb-10">Registre-se no To-do List e comece a organizar suas ideias <strong>hoje</strong></h2>
-            <Input type="text" placeholder="Nome" onChange={(e) => setNome(e.target.value)}/>
+            <Input type="text" placeholder="Nome de Usuário" onChange={(e) => setNome(e.target.value)}/>
             <Input type="email" placeholder="E-mail" onChange={(e) => setEmail(e.target.value)}/>
             <Input type="password" placeholder="Senha" onChange={(e) => setSenha(e.target.value)} />
             <Input type="password" placeholder="Confirmar Senha" onChange={(e) => setConfirmar(e.target.value)}/>

@@ -124,37 +124,57 @@ export function ViewList(){
     const userName = localStorage.getItem("userName");
     const userEmail = localStorage.getItem("userEmail");
     const [listas, setListas] = useState<Lista[]>([]);
+    const [listaAberta, setListaAberta] = useState<string | null>(null);
 
     const CarregarListas = async () => {
         const data = await axios.get(`http://localhost:8000/lists?userEmail=${userEmail}`);
         setListas(data.data);
     }
+
     const DeletarLista = async (id: string) => {
         await axios.delete(`http://localhost:8000/lists/${id}`)
         setListas(listas.filter(l => l.id !== id));
     }
 
+    const ToggleLista = (id: string) => {
+        setListaAberta(listaAberta === id ? null : id);
+    }
+
     return(
-        <div className="flex flex-col text-center border-blue-600 border-2 bg-blue-300 sm:w-[60vw] sm:min-h-[70vh] w-[90vw] min-h-[50vh] rounded-3xl items-center">
-            <h1 className="text-4xl text-white font-semibold m-15">Bem-vindo às suas Listas {userName}!</h1>
-            <Button onClick={CarregarListas}> Carregar Listas </Button>
-            <div className="flex flex-col gap-4 w-full mt-4">
+        <div className="flex flex-col items-center text-center border-blue-600 border-2 bg-blue-300 sm:w-[60vw] sm:min-h-[70vh] w-[90vw] min-h-[50vh] rounded-3xl p-6 gap-6">
+            <h1 className="text-4xl text-white font-semibold">Bem-vindo às suas Listas, {userName}!</h1>
+            <Button onClick={CarregarListas}>Carregar Listas</Button>
+
+            <div className="flex flex-col gap-4 w-full">
                 {listas.map((lista) => (
-                    <div key={lista.id} className="flex flex-col xl:flex-row justify-between items-start bg-white p-4 rounded-2xl border border-black shadow-md hover:shadow-xl transition-shadow duration-300">
-                        <div className="flex flex-col gap-2">
-                            <h2 className="font-bold text-lg">{lista.nome}</h2>
-                            <p>{lista.descricao}</p>
-                            <ul className="list-disc list-inside mt-2">
-                                {lista.tarefas.map((t, i) => (
-                                    <li key={i}>{t}</li>
-                                ))}
-                            </ul>
+                    <div 
+                        key={lista.id} 
+                        className="flex flex-col xl:flex-row justify-between items-start bg-white p-5 rounded-3xl border border-black transition-all hover:scale-105 shadow-2xl duration-300 cursor-pointer"
+                        onClick={() => ToggleLista(lista.id)}
+                    >
+                        <div className="flex flex-col w-full xl:w-3/4 gap-2">
+                            <h2 className="font-bold text-xl sm:text-2xl">{lista.nome}</h2>
+                            <p className="text-gray-700">{lista.descricao}</p>
+
+                            {listaAberta === lista.id && (
+                                <ul className="list-disc list-inside mt-3 ml-4 text-gray-800">
+                                    {lista.tarefas.map((t, i) => (
+                                        <li key={i} className="py-1 border-b border-gray-200 wrap-break-words">{t}</li>
+                                    ))}
+                                </ul>
+                            )}
                         </div>
 
-                        <div className="flex gap-2 mt-2 xl:mt-0">
+                        <div className="flex flex-col gap-2 mt-4 xl:mt-0">
+                            <span className="text-gray-500 text-xl">{listaAberta === lista.id ? "▲" : "▼"}</span>
                             <button 
-                                className="bg-red-500 text-white px-3 py-1 rounded-full font-bold hover:scale-110 transition-transform hover:cursor-pointer"
-                                onClick={() => DeletarLista(lista.id)}> X </button>
+                                className="bg-red-500 text-white px-3 py-1 rounded-full font-bold hover:scale-110 hover:bg-red-600 transition-all hover:cursor-pointer hover:shadow-2xl shadow-2xl hover:shadow-black border-black border"
+                                onClick={() => {
+                                    DeletarLista(lista.id);
+                                }}
+                            >
+                                X
+                            </button>
                         </div>
                     </div>
                 ))}
