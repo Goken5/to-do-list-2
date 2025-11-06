@@ -1,33 +1,50 @@
 import { Router, Request, Response } from "express";
-import { users, User } from "../database/data";
+import User from '../models/User.js';
 
 const router = Router();
 
-router.post("/register", (req: Request, res: Response) => {
-  const { nome, email, senha } = req.body;
+router.post("/register", async (req, res) => {
+  try {
+    const { nome, email, senha } = req.body;
 
-  if (users.find((u) => u.email === email)) {
-    return res.status(400).json({ message: "usuario ja existe" });
+    const userExists = await User.findOne({ email });
+    if (userExists) {
+      return res.status(400).json({ message: "Usuário já existe" });
+    }
+
+    const user = await User.create({ nome, email, senha });
+
+    res.status(201).json({ 
+      message: "Usuário criado com sucesso",
+      user,
+    });
+    
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Erro interno do servidor" });
   }
-
-  users.push({ nome, email, senha });
-  return res.status(201).json({ message: "usuario cadastrado" });
 });
 
-router.post("/login", (req: Request, res: Response) => {
-  const { email, senha } = req.body;
+router.post("/login", async (req, res) => {
+  try {
+    const { email, senha } = req.body;
 
-  const user = users.find((u) => u.email === email);
-  if (!user) return res.status(404).json({ message: "usuario nao existe" });
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "Usuário não encontrado" });
+    }
 
-  if (user.senha !== senha)
-    return res.status(401).json({ message: "senha incorreta" });
+    if (user.senha !== senha) {
+      return res.status(401).json({ message: "Senha incorreta" });
+    }
 
-  return res.json({ 
-    message: "sucesso no login",
-    user: { nome: user.nome, email: user.email } 
-  });
-  
+    res.json({ 
+      message: "Login realizado com sucesso",
+      user,
+    });
+    
+  } catch (error) {
+    res.status(500).json({ message: "Erro interno do servidor" });
+  }
 });
-
-export default router;
+export default router

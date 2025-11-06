@@ -1,33 +1,56 @@
 import { Router, Request, Response } from "express";
-import { Lista, listas } from "../database/data";
+import List from "../models/Lists.js";
 
 const router = Router();
 
-router.post("/", (req: Request, res: Response) => {
-    const { id, nome, descricao, tarefas, userEmail } = req.body;
+router.post("/", async (req: Request, res: Response) => {
+    try {
+        const { nome, descricao, tarefas, userEmail } = req.body;
 
-    listas.push({ id, nome, descricao, tarefas, userEmail })
-    return res.status(201).json({
-        message: "Lista criada com sucesso",
-    })
-})
+        const lista = await List.create({ 
+            nome, 
+            descricao, 
+            tarefas, 
+            userEmail 
+        });
+        return res.status(201).json({
+            message: "Lista criada com sucesso",
+            lista
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Erro ao criar lista" });
+    }
+});
 
-router.get("/", (req: Request, res: Response) => {
-    const userEmail = req.query.userEmail as string;
-    if(!userEmail) return res.status(400).json({ message: "cade o email"});
+router.get("/", async (req: Request, res: Response) => {
+    try {
+        const userEmail = req.query.userEmail as string;
+        
+        if (!userEmail) {
+            return res.status(400).json({ message: "Email é obrigatório" });
+        }
+        const listasUser = await List.find({ userEmail });
+        return res.json(listasUser);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Erro ao buscar listas" });
+    }
+});
 
-    const listasUser = listas.filter(l => l.userEmail === userEmail);
-    return res.json(listasUser);
-})
+router.delete("/:id", async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
 
-router.delete("/:id", (req: Request, res: Response) => {
-    const { id } = req.params;
-    const index = listas.findIndex(l => l.id === id);
+        const lista = await List.findByIdAndDelete(id);
+        if (!lista) {
+            return res.status(404).json({ message: "Lista não encontrada" });
+        }
+        return res.json({ message: "Lista deletada com sucesso" });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Erro ao deletar lista" });
+    }
+});
 
-    if(index === -1) return res.status(404).json({ message: "essa lista nem existe"});
-    listas.splice(index, 1);
-    return res.json({ message: "ja foi essa merda"});
-})
-
-
-export default router
+export default router;
