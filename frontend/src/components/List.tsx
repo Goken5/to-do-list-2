@@ -1,34 +1,63 @@
-import { useNavigate } from "react-router-dom"
 import { useState } from "react";
 import axios from "axios";
-import { v4 as uuidv4 } from "uuid";
+import { toast } from 'react-toastify';
 
 import { Input, Button } from "./Input";
 
-interface ListDivProps {
-    CreateList: () => void;
+type ModalMode = "criar" | "ver";
+
+interface ModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    children: React.ReactNode;
+    mode: ModalMode;
 }
-export function ListDiv({ CreateList } : ListDivProps){
-    const navigate = useNavigate();
 
-    return(
-        <div className="flex flex-col text-center justify-center items-center
-        border-blue-600 border-2 bg-blue-300
-        w-[90vw] max-w-[700px] rounded-3xl p-6 mt-6 shadow-lg shadow-black/40">
+function Modal({ isOpen, onClose, children, mode }: ModalProps) {
+    if (!isOpen) return null;
+
+    const modalStyles = {
+        criar: {
+            header: "bg-blue-500",
+            title: "text-blue-700",
+            border: "border-blue-300"
+        },
+        ver: {
+            header: "bg-blue-500", 
+            title: "text-blue-700",
+            border: "border-blue-300"
+        }
+    };
+
+    const currentStyle = modalStyles[mode];
+
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className={`bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border-4 ${currentStyle.border}`}>
+                <div className={`${currentStyle.header} rounded-t-2xl p-4`}>
+                    <div className="flex justify-between items-center">
+                        <h2 className="text-xl font-bold text-white">
+                            {mode === "criar" ? " Criar Nova Lista" : " Detalhes da Lista"}
+                        </h2>
+                        <button 
+                            onClick={onClose}
+                            className="text-white hover:text-gray-200 text-2xl font-bold hover:scale-110 transition-transform"
+                        >
+                            ✕
+                        </button>
+                    </div>
+                </div>
                 
-            <h1 className="text-3xl sm:text-4xl text-white font-semibold mb-6">
-                Sobre suas Listas
-            </h1>
-
-            <div className="flex flex-col gap-3 w-full items-center">
-                <Button onClick={CreateList}>Criar uma nova Lista</Button>
-                <Button onClick={() => navigate("/lists")}>Visualizar suas Listas</Button>
+                <div className="px-6 pb-6 pt-4">
+                    {children}
+                </div>
             </div>
         </div>
-    )
+    );
 }
 
-export function CreateListDiv() {
+
+function ConteudoCriarLista({ onClose }: { onClose: () => void }) {
     const [nome, setNome] = useState("");
     const [descricao, setDescricao] = useState("");
     const [tarefa, setTarefa] = useState<string[]>([]);
@@ -37,14 +66,32 @@ export function CreateListDiv() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const data = await axios.post("http://localhost:8000/lists", {
-            id: uuidv4(),
-            nome,
-            descricao,
-            tarefas: tarefa,
-            userEmail,
-        });
-        console.log(data);
+        
+        if (!nome.trim() || !userEmail) {
+            toast.error("Nome da lista é obrigatório!");
+            return;
+        }
+    
+        try {
+            const data = await axios.post("http://localhost:8000/lists", {
+                nome: nome.trim(),
+                descricao: descricao.trim(),
+                tarefas: tarefa,
+                userEmail,
+            });
+            console.log(data);
+            toast.success("Lista Criada!");
+            
+            setNome("");
+            setDescricao("");
+            setTarefa([]);
+            setNovaTarefa("");
+            onClose();
+            
+        } catch (error) {
+            console.error("Erro ao criar lista:", error);
+            toast.error("Erro ao criar lista!");
+        }
     }
 
     const criarTarefa = () => {
@@ -58,63 +105,123 @@ export function CreateListDiv() {
     }
 
     return (
-        <div className="flex flex-col items-center w-[90vw] max-w-[700px] mt-6 bg-blue-300
-            border-2 border-blue-600 rounded-3xl p-6
-            shadow-lg shadow-black/40">
-
-            <h1 className="text-2xl sm:text-3xl text-white font-semibold mb-6">
+        <div className="text-center">
+            <h1 className="text-2xl sm:text-3xl text-blue-700 font-semibold mb-6">
                 Crie sua Lista
             </h1>
 
             <form className="flex flex-col items-center w-full" onSubmit={handleSubmit}>
                 <Input 
                     type="text" 
-                    placeholder="Nome da Lista (ex: lista de tarefas)" 
+                    placeholder="Nome da Lista (ex: Lista de Compras)" 
+                    value={nome}
                     onChange={(e) => setNome(e.target.value)}
                 />
                 <Input 
                     type="text" 
                     placeholder="Descrição da Lista" 
+                    value={descricao}
                     onChange={(e) => setDescricao(e.target.value)} 
                 />
-                <div className="flex w-full gap-2 items-center mt-2 flex-col xl:flex-row">
+                
+                <div className="flex w-full gap-2 items-center mt-2 flex-col sm:flex-row">
                     <Input 
                         type="text" 
-                        placeholder="Nova Tarefa" 
+                        placeholder="Digite uma nova tarefa..." 
                         value={novaTarefa} 
                         onChange={(e) => setNovaTarefa(e.target.value)}
                     />
-                    <Button type="button" onClick={criarTarefa}>Adicionar</Button>
+                    <Button type="button" onClick={criarTarefa} className="bg-blue-600 hover:bg-blue-700">
+                         Adicionar
+                    </Button>
                 </div>
 
-                <ul className="w-full mt-4 flex flex-col gap-2 mb-4">
-                    {tarefa.map((t, index) => (
-                        <li key={index} className="flex justify-between items-center
-                            bg-white text-black p-3 rounded-2xl border border-black shadow-md
-                            hover:shadow-xl transition-shadow duration-300">
-                            <span className="font-medium">{index + 1}: {t}</span>
-                            <button 
-                                type="button" 
-                                className="bg-red-500 text-white px-3 py-1 rounded-full font-bold hover:scale-110 transition-transform hover:cursor-pointer"
-                                onClick={() => deletarTarefa(index)}
-                            >
-                                X
-                            </button>
-                        </li>
-                    ))}
-                </ul>
-
-                <Button type="submit">Criar Lista</Button>
+                <div className="w-full mt-4">
+                    <h3 className="text-lg font-semibold text-gray-700 mb-3">
+                        📋 Tarefas Adicionadas ({tarefa.length})
+                    </h3>
+                    {tarefa.length === 0 ? (
+                        <p className="text-gray-500 italic">Nenhuma tarefa adicionada ainda</p>
+                    ) : (
+                        <ul className="flex flex-col gap-2 mb-4 max-h-40 overflow-y-auto">
+                            {tarefa.map((t, index) => (
+                                <li key={index} className="flex justify-between items-center
+                                    bg-blue-50 text-black p-3 rounded-2xl border border-blue-200">
+                                    <span className="font-medium">{index + 1}. {t}</span>
+                                    <button 
+                                        type="button" 
+                                        className="bg-red-500 text-white px-3 py-1 rounded-full font-bold hover:scale-110 transition-transform hover:cursor-pointer text-sm"
+                                        onClick={() => deletarTarefa(index)}
+                                    >
+                                        X
+                                    </button>
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </div>
+                
+                <div className="flex gap-4 mt-4 flex-col sm:flex-row">
+                    <Button type="button" onClick={onClose} className="bg-gray-500 hover:bg-gray-600">
+                        Cancelar
+                    </Button>
+                    <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
+                        Criar Lista
+                    </Button>
+                </div>
             </form>
         </div>
-    )
+    );
 }
 
+function ConteudoVerLista({ lista, onClose }: { lista: any, onClose: () => void }) {
+    return (
+        <div className="text-center">
+            <h1 className="text-2xl sm:text-3xl text-blue-700 font-semibold mb-6">
+                 Detalhes da Lista
+            </h1>
 
+            <div className="space-y-6">
+                <div className="bg-blue-50 p-4 rounded-2xl border border-blue-200">
+                    <h2 className="text-xl font-bold text-blue-800 mb-2">{lista.nome}</h2>
+                    <p className="text-gray-600">{lista.descricao}</p>
+                </div>
 
-export function ViewList(){ 
+                <div className="bg-white p-4 rounded-2xl border border-blue-200">
+                    <h3 className="text-lg font-semibold text-blue-700 mb-4">
+                        📝 Tarefas ({lista.tarefas.length})
+                    </h3>
+                    
+                    {lista.tarefas.length === 0 ? (
+                        <p className="text-gray-500 italic">Nenhuma tarefa nesta lista</p>
+                    ) : (
+                        <ul className="space-y-3 text-left">
+                            {lista.tarefas.map((tarefa: string, index: number) => (
+                                <li key={index} className="flex items-center gap-3 py-2 border-b border-gray-200">
+                                    <span className="bg-blue-100 text-blue-800 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">
+                                        {index + 1}
+                                    </span>
+                                    <span className="text-gray-700">{tarefa}</span>
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </div>
+
+                <div className="flex gap-4 mt-6 flex-col sm:flex-row">
+                    <Button onClick={onClose} className="bg-blue-600 hover:bg-blue-700">
+                        Voltar
+                    </Button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+// COMPONENTE PRINCIPAL - VIEWLIST
+export function ViewList() { 
     interface Lista {
-        id: string;
+        _id: string;
         nome: string;
         descricao: string;
         tarefas: string[];
@@ -124,61 +231,119 @@ export function ViewList(){
     const userName = localStorage.getItem("userName");
     const userEmail = localStorage.getItem("userEmail");
     const [listas, setListas] = useState<Lista[]>([]);
-    const [listaAberta, setListaAberta] = useState<string | null>(null);
+
+    const [modalListaAberto, setModalListaAberto] = useState(false);
+    const [modalCriarAberto, setModalCriarAberto] = useState(false);
+    const [listaSelecionada, setListaSelecionada] = useState<Lista | null>(null);
 
     const CarregarListas = async () => {
-        const data = await axios.get(`http://localhost:8000/lists?userEmail=${userEmail}`);
-        setListas(data.data);
+        try {
+            const response = await axios.get(`http://localhost:8000/lists?userEmail=${userEmail}`);
+            console.log("Listas carregadas:", response.data);
+            setListas(response.data);
+        } catch (error) {
+            console.error("Erro ao carregar listas:", error);
+            toast.error("Erro ao carregar listas!");
+        }
     }
 
-    const DeletarLista = async (id: string) => {
-        await axios.delete(`http://localhost:8000/lists/${id}`)
-        setListas(listas.filter(l => l.id !== id));
+    const DeletarLista = async (id: string, e: React.MouseEvent) => {
+        e.stopPropagation()
+        
+        try {
+            await axios.delete(`http://localhost:8000/lists/${id}`);
+            setListas(listas.filter(l => l._id !== id));
+            toast.success("Lista deletada!");
+        } catch (error) {
+            console.error("Erro ao deletar lista:", error);
+            toast.error("Erro ao deletar lista!");
+        }
     }
 
-    const ToggleLista = (id: string) => {
-        setListaAberta(listaAberta === id ? null : id);
+    const abrirModalLista = (lista: Lista) => {
+        setListaSelecionada(lista);
+        setModalListaAberto(true);
+    }
+
+    const abrirModalCriar = () => {
+        setModalCriarAberto(true);
+    }
+
+    const fecharModalLista = () => {
+        setModalListaAberto(false);
+        setListaSelecionada(null);
+    }
+
+    const fecharModalCriar = () => {
+        setModalCriarAberto(false);
     }
 
     return(
-        <div className="flex flex-col items-center text-center border-blue-600 border-2 bg-blue-300 sm:w-[60vw] sm:min-h-[70vh] w-[90vw] min-h-[50vh] rounded-3xl p-6 gap-6">
+        <div className="flex flex-col items-center text-center border-blue-600 border-2 bg-blue-300 sm:w-[60vw] w-[90vw] sm:min-h-[70vh] min-h-[50vh] rounded-3xl p-6 gap-6 mt-5">
             <h1 className="text-4xl text-white font-semibold">Bem-vindo às suas Listas, {userName}!</h1>
-            <Button onClick={CarregarListas}>Carregar Listas</Button>
+            
+            <div className="flex flex-col sm:flex-row gap-4">
+                <Button onClick={CarregarListas}>Carregar Listas</Button>
+                <Button onClick={abrirModalCriar} className="bg-blue-600 hover:bg-blue-700">
+                    Criar Nova Lista
+                </Button>
+            </div>
 
             <div className="flex flex-col gap-4 w-full">
-                {listas.map((lista) => (
-                    <div 
-                        key={lista.id} 
-                        className="flex flex-col xl:flex-row justify-between items-start bg-white p-5 rounded-3xl border border-black transition-all hover:scale-105 shadow-2xl duration-300 cursor-pointer"
-                        onClick={() => ToggleLista(lista.id)}
-                    >
-                        <div className="flex flex-col w-full xl:w-3/4 gap-2">
-                            <h2 className="font-bold text-xl sm:text-2xl">{lista.nome}</h2>
-                            <p className="text-gray-700">{lista.descricao}</p>
-
-                            {listaAberta === lista.id && (
-                                <ul className="list-disc list-inside mt-3 ml-4 text-gray-800">
-                                    {lista.tarefas.map((t, i) => (
-                                        <li key={i} className="py-1 border-b border-gray-200 wrap-break-words">{t}</li>
-                                    ))}
-                                </ul>
-                            )}
-                        </div>
-
-                        <div className="flex flex-col gap-2 mt-4 xl:mt-0">
-                            <span className="text-gray-500 text-xl">{listaAberta === lista.id ? "▲" : "▼"}</span>
-                            <button 
-                                className="bg-red-500 text-white px-3 py-1 rounded-full font-bold hover:scale-110 hover:bg-red-600 transition-all hover:cursor-pointer hover:shadow-2xl shadow-2xl hover:shadow-black border-black border"
-                                onClick={() => {
-                                    DeletarLista(lista.id);
-                                }}
-                            >
-                                X
-                            </button>
-                        </div>
+                {listas.length === 0 ? (
+                    <div className="bg-white p-8 rounded-3xl text-gray-500">
+                        📝 Nenhuma lista encontrada. Crie sua primeira lista!
                     </div>
-                ))}
+                ) : (
+                    listas.map((lista) => (
+                        <div 
+                            key={lista._id} 
+                            className="flex flex-col xl:flex-row justify-between items-start bg-white p-5 rounded-3xl border border-black transition-all hover:scale-105 shadow-2xl duration-300 cursor-pointer"
+                            onClick={() => abrirModalLista(lista)}
+                        >
+                            <div className="flex flex-col w-full xl:w-3/4 gap-2">
+                                <h2 className="font-bold text-xl sm:text-2xl">{lista.nome}</h2>
+                                <p className="text-gray-700">{lista.descricao}</p>
+                                <p className="text-sm text-gray-500">
+                                    📋 {lista.tarefas.length} tarefa(s) - Clique para ver detalhes
+                                </p>
+                            </div>
+
+                            <div className="flex flex-col gap-2 mt-4 xl:mt-0">
+                                <button 
+                                    className="bg-red-500 text-white px-3 py-1 rounded-full font-bold hover:scale-110 hover:bg-red-600 transition-all hover:cursor-pointer hover:shadow-2xl shadow-2xl hover:shadow-black border-black border"
+                                    onClick={(e) => DeletarLista(lista._id, e)}
+                                >
+                                    X
+                                </button>
+                            </div>
+                        </div>
+                    ))
+                )}
             </div>
+
+            {/* MODAL PARA VER DETALHES DA LISTA */}
+            <Modal 
+                isOpen={modalListaAberto} 
+                onClose={fecharModalLista}
+                mode="ver"
+            >
+                {listaSelecionada && (
+                    <ConteudoVerLista 
+                        lista={listaSelecionada} 
+                        onClose={fecharModalLista} 
+                    />
+                )}
+            </Modal>
+
+            {/* MODAL PARA CRIAR NOVA LISTA */}
+            <Modal 
+                isOpen={modalCriarAberto} 
+                onClose={fecharModalCriar}
+                mode="criar"
+            >
+                <ConteudoCriarLista onClose={fecharModalCriar} />
+            </Modal>
         </div>
-    )
+    );
 }

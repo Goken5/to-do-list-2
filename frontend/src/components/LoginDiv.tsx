@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useState, type FormEvent } from "react";
 import { Input, Button } from "./Input"
 import axios from "axios";
+import { toast } from "react-toastify";
 
 export function Login(){
     const navigate = useNavigate();
@@ -21,11 +22,12 @@ export function Login(){
 
         console.log(data)
         navigate("/main")
+        toast.success("Logado com Sucesso!")
     }
     
     return( 
         <form onSubmit={handleClick} className=" flex flex-col text-center justify-center border-blue-600 border-2 bg-blue-300 xl:w-[40vw] w-screen h-[70vh] rounded-3xl items-center shadow-lg shadow-black/40">
-            <h1 className="text-4xl text-white font-bold mb-5">Bem indo!</h1>
+            <h1 className="text-4xl text-white font-bold mb-5">Bem vindo!</h1>
             <h2 className="text-3xl text-white font-bold mb-10">Faça Login no To-do List</h2>
             <Input type="email" placeholder="E-mail" onChange={(e) => setEmail(e.target.value)}/>
             <Input type="password" placeholder="Senha" onChange={(e) => setSenha(e.target.value)}/>
@@ -64,7 +66,7 @@ export function SignUp(){
 
         console.log(data);
         navigate("/main");
-        
+        toast.success("Conta criada com sucesso!")
     }
 
     return(

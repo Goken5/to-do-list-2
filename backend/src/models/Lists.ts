@@ -11,32 +11,25 @@ export interface IList extends Document {
     createdAt: Date;
 }
 
-const ListSchema: Schema = new Schema({
+const ListSchema = new mongoose.Schema({
     nome: {
         type: String,
-        required: [true, 'Nome é obrigatório'],
+        required: true,
         trim: true
     },
     descricao: {
         type: String,
-        trim: true
+        default: ""
     },
     tarefas: [{
-        texto: {
-            type: String,
-            required: true
-        },
-        completed: {
-            type: Boolean,
-            default: false
-        }
+        type: String
     }],
     userEmail: {
         type: String,
-        required: [true, 'Email do usuário é obrigatório']
+        required: true
     }
 }, {
     timestamps: true
 });
 
-export default mongoose.model<IList>('List', ListSchema);
+export default mongoose.model("List", ListSchema);
