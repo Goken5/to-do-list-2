@@ -38,7 +38,7 @@ export function Login() {
             toast.success("Logado com Sucesso!");
             
         } catch (error: any) {
-            console.error("❌ Erro no login:", error);
+            console.error("Erro no login:", error);
             
             if (error.response) {
                 // Servidor respondeu com status de erro
@@ -60,7 +60,6 @@ export function Login() {
             } else if (error.request) {
                 // Request foi feito mas não houve resposta
                 console.error("Sem resposta do servidor:", error.request);
-                toast.error("Servidor não respondeu. Verifique se o backend está rodando.");
             } else {
                 // Outro erro
                 console.error("Erro inesperado:", error.message);
@@ -153,7 +152,7 @@ export function SignUp() {
         setLoading(true);
 
         try {
-            console.log("🔄 Tentando criar conta...");
+            console.log("Tentando criar conta...");
             
             const response = await api.post("/users/register", {
                 nome: nome,
