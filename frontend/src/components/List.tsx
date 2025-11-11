@@ -1,10 +1,10 @@
 import { useState } from "react";
-import axios from "axios";
 import { toast } from 'react-toastify';
-
+import { api } from "../services/ApiService";
 import { Input, Button } from "./Input";
 
 type ModalMode = "criar" | "ver";
+
 
 interface ModalProps {
     isOpen: boolean;
@@ -73,7 +73,7 @@ function ConteudoCriarLista({ onClose }: { onClose: () => void }) {
         }
     
         try {
-            const data = await axios.post("http://localhost:8000/lists", {
+            const data = await api.post("http://localhost:8000/lists", {
                 nome: nome.trim(),
                 descricao: descricao.trim(),
                 tarefas: tarefa,
@@ -238,7 +238,7 @@ export function ViewList() {
 
     const CarregarListas = async () => {
         try {
-            const response = await axios.get(`http://localhost:8000/lists?userEmail=${userEmail}`);
+            const response = await api.get(`http://localhost:8000/lists?userEmail=${userEmail}`);
             console.log("Listas carregadas:", response.data);
             setListas(response.data);
         } catch (error) {
@@ -251,7 +251,7 @@ export function ViewList() {
         e.stopPropagation()
         
         try {
-            await axios.delete(`http://localhost:8000/lists/${id}`);
+            await api.delete(`http://localhost:8000/lists/${id}`);
             setListas(listas.filter(l => l._id !== id));
             toast.success("Lista deletada!");
         } catch (error) {

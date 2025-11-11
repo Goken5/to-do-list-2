@@ -13,6 +13,6 @@ connectDB();
 app.use("/users", userRoutes);
 app.use("/lists", listRoutes);
 
-app.listen(8000, () => {
-  console.log("Servidor rodando na porta 8000");
+app.listen(3000, () => {
+  console.log("Servidor rodando na porta 3000");
 });
