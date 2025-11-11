@@ -5,7 +5,7 @@ export default function RegisterPage(){
     return(
         <div className="flex flex-col min-h-screen">
             <Header />
-            <div className="flex flex-1 justify-center items-center px-4 sm:px-[100px] flex-col-reverse sm:flex-row w-screen">
+            <div className="flex flex-1 justify-center items-center px-4 sm:px-[100px] flex-col-reverse sm:flex-row w-screen bg-linear-to-b from-blue-900 to-blue-50">
                 <SignUp />
             </div>
             <Footer />

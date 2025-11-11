@@ -3,27 +3,46 @@ import React from "react";
 type InputProps = React.InputHTMLAttributes<HTMLInputElement>;
 type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement>;
 
-export function Input({ ...props }: InputProps) {
+export function Input({ className = "", ...props }: InputProps) {
   return (
     <input
       {...props}
-      className="bg-white rounded-3xl w-[80vw] sm:w-[50vw] xl:w-[25vw] p-2 
-      focus:scale-110 transition-all duration-300 ease-in-out 
-      focus:shadow-black focus:shadow-2xl focus:outline-blue-700 
-      hover:cursor-text border border-solid m-3"
+      className={`
+        w-full px-4 py-3 
+        border border-gray-300 rounded-lg
+        focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
+        focus:outline-none
+        focus:scale-105
+        ease-in-out
+        transition-all duration-300
+        bg-white
+        ${className}
+      `}
     />
   );
 }
-export function Button({ children, ...props}: ButtonProps) {
+
+export function Button({ children, className = "", ...props }: ButtonProps) {
   return (
     <button
       {...props}
-      className="bg-blue-700 rounded-3xl border-black border-2 py-3 px-10
-        hover:scale-110 hover:cursor-pointer transition-all
-        text-white font-medium hover:text-black hover:shadow-2xl
-        hover:shadow-black mb-3 w-fit sm:w-auto"
+      className={`
+        w-full px-6 py-3
+        bg-blue-600 text-white 
+        rounded-lg
+        font-medium
+        hover:bg-blue-700 
+        active:bg-blue-800
+        hover:scale-105
+        hover:cursor-pointer
+        ease-in-out
+        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+        transition-all duration-300
+        disabled:opacity-50 disabled:cursor-not-allowed
+        ${className}
+      `}
     >
       {children}
     </button>
-  )
+  );
 }

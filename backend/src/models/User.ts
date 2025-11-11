@@ -1,31 +1,50 @@
 import mongoose from 'mongoose';
+import bcrypt from 'bcrypt';
 
-const UserSchema = new mongoose.Schema({
+interface IUserMethods {
+  compareSenha(senhaDigitada: string): Promise<boolean>;
+}
+
+// Interface pq o Typescript me fudeu
+interface IUser extends mongoose.Document {
+  nome: string;
+  email: string;
+  senha: string;
+  compareSenha(senhaDigitada: string): Promise<boolean>;
+}
+
+const userSchema = new mongoose.Schema<IUser>({
   nome: {
     type: String,
-    required: [true, 'Nome é obrigatório'],
-    trim: true
+    required: true
   },
   email: {
     type: String,
-    required: [true, 'Email é obrigatório'],
-    unique: true,
-    lowercase: true,
-    trim: true
+    required: true,
+    unique: true
   },
   senha: {
     type: String,
-    required: [true, 'Senha é obrigatória'],
-    minlength: 8
+    required: true
   }
 }, {
   timestamps: true
 });
 
-UserSchema.methods.toJSON = function() {
-  const user = this.toObject();
-  delete user.senha;
-  return user;
+userSchema.pre('save', async function(next) {
+  if (!this.isModified('senha')) return next();
+  
+  try {
+    const salt = await bcrypt.genSalt(12);
+    this.senha = await bcrypt.hash(this.senha, salt);
+    next();
+  } catch (error) {
+    next(error as Error);
+  }
+});
+
+userSchema.methods.compareSenha = async function(senhaDigitada: string): Promise<boolean> {
+  return await bcrypt.compare(senhaDigitada, this.senha);
 };
 
-export default mongoose.model('User', UserSchema);
+export default mongoose.model<IUser>('User', userSchema);
