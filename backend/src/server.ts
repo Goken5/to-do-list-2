@@ -4,8 +4,14 @@ import userRoutes from "./routes/UserRoutes";
 import listRoutes from "./routes/ListRoutes";
 import connectDB from "./config/database";
 
+const port = 3000
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:5173",
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true,
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
 app.use(express.json());
 
 connectDB();
@@ -13,6 +19,14 @@ connectDB();
 app.use("/users", userRoutes);
 app.use("/lists", listRoutes);
 
-app.listen(3000, () => {
-  console.log("Servidor rodando na porta 3000");
+app.get("/", (req, res) => {
+  res.json({ 
+    message: "Backend tá rodando dboa",
+    status: "OK",
+    timestamp: new Date().toISOString()
+  });
+});
+
+app.listen(port, () => {
+  console.log("Servidor rodando na porta " + port);
 });

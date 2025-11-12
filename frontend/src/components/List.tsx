@@ -73,7 +73,7 @@ function ConteudoCriarLista({ onClose }: { onClose: () => void }) {
         }
     
         try {
-            const data = await api.post("http://localhost:8000/lists", {
+            const data = await api.post("/lists", {
                 nome: nome.trim(),
                 descricao: descricao.trim(),
                 tarefas: tarefa,
@@ -258,7 +258,7 @@ export function ViewList() {
 
     const CarregarListas = async () => {
         try {
-            const response = await api.get(`http://localhost:8000/lists?userEmail=${userEmail}`);
+            const response = await api.get(`/lists?userEmail=${userEmail}`);
             console.log("Listas carregadas:", response.data);
             setListas(response.data);
             toast.success("Listas carregadas com sucesso!");
@@ -272,7 +272,7 @@ export function ViewList() {
         e.stopPropagation()
         
         try {
-            await api.delete(`http://localhost:8000/lists/${id}`);
+            await api.delete(`/lists/${id}`);
             setListas(listas.filter(l => l._id !== id));
             toast.success("Lista deletada com sucesso!");
         } catch (error) {
