@@ -2,9 +2,9 @@ import { Router, Request, Response } from "express";
 import List from "../models/Lists";
 import mongoose from "mongoose"; // Importe o mongoose
 
-const router = Router();
+const listRouter = Router();
 
-router.post("/", async (req: Request, res: Response) => {
+listRouter.post("/", async (req: Request, res: Response) => {
     try {
         const { nome, descricao, tarefas, userEmail } = req.body;
 
@@ -35,7 +35,7 @@ router.post("/", async (req: Request, res: Response) => {
     }
 });
 
-router.get("/", async (req: Request, res: Response) => {
+listRouter.get("/", async (req: Request, res: Response) => {
     try {
         const userEmail = req.query.userEmail as string;
         
@@ -50,7 +50,7 @@ router.get("/", async (req: Request, res: Response) => {
     }
 });
 
-router.delete("/:id", async (req: Request, res: Response) => {
+listRouter.delete("/:id", async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
 
@@ -80,4 +80,4 @@ router.delete("/:id", async (req: Request, res: Response) => {
     }
 });
 
-export default router;
+export default listRouter;

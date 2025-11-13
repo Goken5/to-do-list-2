@@ -1,9 +1,9 @@
 import { Router, Request, Response } from "express";
 import User from '../models/User';
 
-const router = Router();
+const userRouter = Router();
 
-router.post("/register", async (req: Request, res: Response) => {
+userRouter.post("/register", async (req: Request, res: Response) => {
   try {
     const { nome, email, senha } = req.body;
 
@@ -29,7 +29,7 @@ router.post("/register", async (req: Request, res: Response) => {
   }
 });
 
-router.post("/login", async (req: Request, res: Response) => {
+userRouter.post("/login", async (req: Request, res: Response) => {
   try {
     const { email, senha } = req.body;
 
@@ -57,4 +57,4 @@ router.post("/login", async (req: Request, res: Response) => {
     res.status(500).json({ message: "Erro interno do servidor" });
   }
 });
-export default router
+export default userRouter;
