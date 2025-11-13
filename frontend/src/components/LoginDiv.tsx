@@ -60,6 +60,7 @@ export function Login() {
             } else if (error.request) {
                 // Request foi feito mas não houve resposta
                 console.error("Sem resposta do servidor:", error.request);
+                toast.error("Erro no Servidor, tente novamente mais tarde");
             } else {
                 // Outro erro
                 console.error("Erro inesperado:", error.message);
@@ -188,6 +189,7 @@ export function SignUp() {
                 
             } else if (error.request) {
                 console.error("Sem resposta do servidor:", error.request);
+                toast.error("Erro no Servidor, tente novamente mais tarde");
             } else {
                 console.error("Erro inesperado:", error.message);
                 toast.error("Erro ao criar conta");
