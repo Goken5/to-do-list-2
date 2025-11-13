@@ -7,10 +7,12 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "postinstall": "npm rebuild esbuild --platform=linux --arch=x64"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.15",
+    "esbuild": "^0.24.0",
     "axios": "^1.12.2",
     "crypto": "^1.0.1",
     "dotenv": "^17.2.3",
