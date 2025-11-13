@@ -3,32 +3,32 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "engines": {
+    "node": "18.x"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "postinstall": "npm rebuild esbuild --platform=linux --arch=x64"
+    "postinstall": "npm rebuild esbuild"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.15",
     "esbuild": "^0.24.0",
     "axios": "^1.12.2",
-    "crypto": "^1.0.1",
     "dotenv": "^17.2.3",
     "flowbite-react": "^0.12.9",
-    "node": "^25.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^7.9.4",
     "react-toastify": "^11.0.5",
     "tailwindcss": "^4.1.15",
-    "toast": "^0.5.4",
     "uuid": "^13.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
-    "@types/node": "^24.6.0",
+    "@types/node": "^18.0.0",
     "@types/react": "^19.1.16",
     "@types/react-dom": "^19.1.9",
     "@vitejs/plugin-react": "^5.0.4",
