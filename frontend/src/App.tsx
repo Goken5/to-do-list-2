@@ -1,5 +1,6 @@
 import { Route, Routes } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
+import { Navigate } from 'react-router-dom';
 
 import LoginPage from './pages/LoginPage';
 import RegisterPage from "./pages/RegisterPage"
@@ -24,7 +25,6 @@ function App() {
         theme="light"
       />
       <Routes>
-        <Route path='*' element={<LoginPage />}/>
         <Route path='/login' element={<LoginPage />} />
         <Route path='/register' element={<RegisterPage />} />
         <Route path='/main' element={
@@ -32,6 +32,7 @@ function App() {
             <MainPage />
           </PrivateRoute>
           } />
+        <Route path='*' element={<Navigate to="login" replace/>}/>
       </Routes>
     </div>
   )
