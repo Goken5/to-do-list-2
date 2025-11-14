@@ -4,7 +4,7 @@ import userRoutes from "./routes/UserRoutes";
 import listRoutes from "./routes/ListRoutes";
 import connectDB from "./config/database";
 
-const port = 3000
+//const port = 3000
 const app = express();
 app.use(cors({
   origin: ["http://localhost:5173", "https://to-do-list-goken.vercel.app"],
@@ -30,3 +30,4 @@ app.get("/", (req, res) => {
 //app.listen(port, () => {
   //console.log("Servidor rodando na porta " + port);
 //});
+export default app
