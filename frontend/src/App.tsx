@@ -32,7 +32,7 @@ function App() {
             <MainPage />
           </PrivateRoute>
           } />
-        <Route path='*' element={<Navigate to="login" replace/>}/>
+        <Route path='*' element={<Navigate to="/login" replace/>}/>
       </Routes>
     </div>
   )
