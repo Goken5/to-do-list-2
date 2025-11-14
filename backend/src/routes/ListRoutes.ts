@@ -49,7 +49,6 @@ listRouter.get("/", async (req: Request, res: Response) => {
         return res.status(500).json({ message: "Erro ao buscar listas" });
     }
 });
-
 listRouter.delete("/:id", async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
@@ -77,6 +76,19 @@ listRouter.delete("/:id", async (req: Request, res: Response) => {
         return res.status(500).json({ 
             message: "Erro ao deletar lista",
         });
+    }
+});
+listRouter.put('/lists/:id', async (req, res) => {
+    try {
+        const { nome, descricao, tarefas } = req.body;
+        const lista = await List.findByIdAndUpdate(
+            req.params.id,
+            { nome, descricao, tarefas },
+            { new: true }
+        );
+        res.json(lista);
+    } catch (error) {
+        res.status(500).json({ error: 'Erro ao atualizar lista' });
     }
 });
 

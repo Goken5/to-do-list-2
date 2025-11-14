@@ -40,15 +40,15 @@ function Modal({ isOpen, onClose, children, mode }: ModalProps) {
                         <h2 className="text-2xl font-bold text-white drop-shadow-md">
                             {mode === "criar" ? "Criar Nova Lista" : "Detalhes da Lista"}
                         </h2>
-                        <button 
+                        <button
                             onClick={onClose}
                             className="text-white hover:text-gray-200 text-2xl font-bold hover:scale-110 transition-transform duration-200 hover:cursor-pointer bg-linear-to-r from-red-700 to-pink-600 p-5 bg-opacity-20 w-8 h-8 rounded-full flex items-center justify-center"
                         >
-                            ✕
+                            X
                         </button>
                     </div>
                 </div>
-                
+
                 <div className="px-8 pb-8 pt-6">
                     {children}
                 </div>
@@ -66,12 +66,12 @@ function ConteudoCriarLista({ onClose }: { onClose: () => void }) {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         if (!nome.trim() || !userEmail) {
             toast.error("Nome da lista é obrigatório!");
             return;
         }
-    
+
         try {
             const data = await api.post("/lists", {
                 nome: nome.trim(),
@@ -81,13 +81,13 @@ function ConteudoCriarLista({ onClose }: { onClose: () => void }) {
             });
             console.log(data);
             toast.success("🎉 Lista Criada com Sucesso!");
-            
+
             setNome("");
             setDescricao("");
             setTarefa([]);
             setNovaTarefa("");
             onClose();
-            
+
         } catch (error) {
             console.error("Erro ao criar lista:", error);
             toast.error("Erro ao criar lista!");
@@ -111,32 +111,32 @@ function ConteudoCriarLista({ onClose }: { onClose: () => void }) {
             </h1>
 
             <form className="flex flex-col items-center w-full space-y-6" onSubmit={handleSubmit}>
-                <Input 
-                    type="text" 
-                    placeholder="Nome da Lista (ex: Lista de Compras)" 
+                <Input
+                    type="text"
+                    placeholder="Nome da Lista (ex: Lista de Compras)"
                     value={nome}
                     onChange={(e) => setNome(e.target.value)}
                     className="border-2 border-blue-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300"
                 />
-                <Input 
-                    type="text" 
-                    placeholder="Descrição da Lista" 
+                <Input
+                    type="text"
+                    placeholder="Descrição da Lista"
                     value={descricao}
                     onChange={(e) => setDescricao(e.target.value)}
                     className="border-2 border-blue-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300"
                 />
-                
+
                 <div className="flex w-full gap-3 items-center mt-4 flex-col sm:flex-row">
-                    <Input 
-                        type="text" 
-                        placeholder="Digite uma nova tarefa..." 
-                        value={novaTarefa} 
+                    <Input
+                        type="text"
+                        placeholder="Digite uma nova tarefa..."
+                        value={novaTarefa}
                         onChange={(e) => setNovaTarefa(e.target.value)}
                         className="border-2 border-blue-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300"
                     />
-                    <Button 
-                        type="button" 
-                        onClick={criarTarefa} 
+                    <Button
+                        type="button"
+                        onClick={criarTarefa}
                         className="bg-linear-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
                     >
                         Adicionar
@@ -157,9 +157,9 @@ function ConteudoCriarLista({ onClose }: { onClose: () => void }) {
                                 <li key={index} className="flex justify-between items-center
                                     bg-linear-to-r from-blue-50 to-indigo-50 text-gray-800 p-4 rounded-2xl border-2 border-blue-100 shadow-sm hover:shadow-md transition-all duration-200">
                                     <span className="font-medium text-lg">{"•"} {t}</span>
-                                    <button 
-                                        type="button" 
-                                        className="bg-linear-to-r from-red-500 to-pink-600 text-white px-4 py-2 rounded-full font-bold hover:scale-110 transform transition-all duration-200 hover:shadow-lg cursor-pointer text-sm shadow-md"
+                                    <button
+                                        type="button"
+                                        className="bg-linear-to-r from-red-500 to-pink-600 text-white px-4 py-2 rounded-full font-bold hover:scale-105 transform transition-all duration-200 hover:shadow-lg cursor-pointer text-sm shadow-md"
                                         onClick={() => deletarTarefa(index)}
                                     >
                                         ✕
@@ -169,17 +169,17 @@ function ConteudoCriarLista({ onClose }: { onClose: () => void }) {
                         </ul>
                     )}
                 </div>
-                
+
                 <div className="flex gap-4 mt-8 flex-col sm:flex-row">
-                    <Button 
-                        type="button" 
-                        onClick={onClose} 
+                    <Button
+                        type="button"
+                        onClick={onClose}
                         className="bg-linear-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
                     >
                         Cancelar
                     </Button>
-                    <Button 
-                        type="submit" 
+                    <Button
+                        type="submit"
                         className="bg-linear-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
                     >
                         Criar Lista
@@ -191,6 +191,20 @@ function ConteudoCriarLista({ onClose }: { onClose: () => void }) {
 }
 
 function ConteudoVerLista({ lista, onClose }: { lista: any, onClose: () => void }) {
+
+    const [tarefasConcluidas, setTarefasConcluidas] = useState<boolean[]>(
+        new Array(lista.tarefas.length).fill(false)
+    );
+
+    const toggleTarefa = (index: number) => {
+        setTarefasConcluidas(prev => {
+            const novasTarefas = [...prev];
+            novasTarefas[index] = !novasTarefas[index];
+            return novasTarefas;
+        });
+    };
+
+
     return (
         <div className="text-center">
             <h1 className="text-3xl sm:text-4xl font-bold bg-linear-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent mb-8">
@@ -207,7 +221,7 @@ function ConteudoVerLista({ lista, onClose }: { lista: any, onClose: () => void 
                     <h3 className="text-xl font-semibold text-emerald-700 mb-6 bg-emerald-50 py-3 rounded-xl border border-emerald-200">
                         📝 Tarefas ({lista.tarefas.length})
                     </h3>
-                    
+
                     {lista.tarefas.length === 0 ? (
                         <p className="text-gray-500 italic py-6 bg-gray-50 rounded-xl border border-gray-200">
                             Nenhuma tarefa nesta lista
@@ -215,11 +229,24 @@ function ConteudoVerLista({ lista, onClose }: { lista: any, onClose: () => void 
                     ) : (
                         <ul className="space-y-4 text-left">
                             {lista.tarefas.map((tarefa: string, index: number) => (
-                                <li key={index} className="flex items-center gap-4 py-3 px-4 bg-white rounded-xl border border-emerald-100 shadow-sm hover:shadow-md transition-all duration-200">
-                                    <span className="bg-linear-to-r from-emerald-500 to-teal-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold shadow-md">
-                                        {index + 1}
+                                <li key={index} className="flex items-center gap-4 py-3 px-4 bg-white rounded-xl border border-emerald-100 shadow-sm hover:shadow-md transition-all duration-200 group">
+                                    {/* To marcando onde tá o botão de concluir tarefa pra caso de merda dps */}
+                                    <button
+                                        onClick={() => toggleTarefa(index)}
+                                        className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all duration-200 hover:scale-110 ${tarefasConcluidas[index]
+                                            ? 'bg-green-500 border-green-500 text-white'
+                                            : 'border-gray-300 hover:border-green-400'
+                                            }`}
+                                    >
+                                        {tarefasConcluidas[index] && '✓'}
+                                    </button>
+
+                                    <span className={`text-lg font-medium transition-all duration-200 ${tarefasConcluidas[index]
+                                        ? 'line-through text-gray-500'
+                                        : 'text-gray-800'
+                                        }`}>
+                                        {tarefa}
                                     </span>
-                                    <span className="text-gray-800 text-lg font-medium">{tarefa}</span>
                                 </li>
                             ))}
                         </ul>
@@ -227,8 +254,8 @@ function ConteudoVerLista({ lista, onClose }: { lista: any, onClose: () => void 
                 </div>
 
                 <div className="flex gap-4 mt-8 flex-col sm:flex-row">
-                    <Button 
-                        onClick={onClose} 
+                    <Button
+                        onClick={onClose}
                         className="bg-linear-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
                     >
                         ← Voltar
@@ -239,7 +266,116 @@ function ConteudoVerLista({ lista, onClose }: { lista: any, onClose: () => void 
     );
 }
 
-export function ViewList() { 
+function ConteudoEditarLista({ lista, onClose, onSave }: { lista: any, onClose: () => void, onSave: (id: string, updates: any) => void }) {
+    const [nome, setNome] = useState(lista.nome);
+    const [descricao, setDescricao] = useState(lista.descricao);
+    const [tarefa, setTarefa] = useState<string[]>(lista.tarefas);
+    const [novaTarefa, setNovaTarefa] = useState("");
+
+    const handleSave = async () => {
+        try {
+            await onSave(lista._id, { nome, descricao, tarefa });
+            onClose();
+            toast.success("Lista atualizada com sucesso");
+        }
+        catch (error) {
+            toast.error("Erro ao atualizar lista");
+        }
+    }
+
+    const AdicionarTarefa = () => {
+        if (novaTarefa.trim() === "") return;
+        setTarefa([...tarefa, novaTarefa]);
+        setNovaTarefa("");
+    };
+
+    const RemoverTarefa = (index: number) => {
+        setTarefa(tarefa.filter((_, i) => i !== index));
+    }
+
+    const EditarTarefa = (index: number, novoTexto: string) => {
+        const novaTarefa = [...tarefa];
+        novaTarefa[index] = novoTexto;
+        setTarefa(novaTarefa);
+    }
+    return (
+        <div className="text-center">
+            <h1 className="text-3xl sm:text-4xl font-bold bg-linear-to-r from-cyan-300 to-cyan-800 bg-clip-text text-transparent mb-8">
+                Editar Lista
+            </h1>
+
+            <div className="space-y-6">
+                <Input
+                    type="text"
+                    placeholder="Nome da Lista"
+                    value={nome}
+                    onChange={(e) => setNome(e.target.value)}
+                    className="border-2 border-cyan-200 focus:border-cyan-500"
+                />
+
+                <Input
+                    type="text"
+                    placeholder="Descrição da Lista"
+                    value={descricao}
+                    onChange={(e) => setDescricao(e.target.value)}
+                    className="border-2 border-cyan-200 focus:border-cyan-500"
+                />
+
+                <div className="flex gap-3 items-center">
+                    <Input
+                        type="text"
+                        placeholder="Nova tarefa..."
+                        value={novaTarefa}
+                        onChange={(e) => setNovaTarefa(e.target.value)}
+                        className="border-2 border-cyan-200 focus:border-cyan-500"
+                    />
+                    <Button
+                        onClick={AdicionarTarefa}
+                        className="bg-linear-to-r from-green-500 to-emerald-600 text-white"
+                    >
+                        +
+                    </Button>
+                </div>
+
+                <div className="max-h-60 overflow-y-auto space-y-2">
+                    {tarefa.map((tarefa, index) => (
+                        <div key={index} className="flex gap-2 items-center bg-purple-50 p-3 rounded-lg">
+                            <Input
+                                type="text"
+                                value={tarefa}
+                                onChange={(e) => EditarTarefa(index, e.target.value)}
+                                className="border border-cyan-300 flex-1"
+                            />
+                            <button
+                                onClick={() => RemoverTarefa(index)}
+                                className="bg-linear-to-r from-red-500 to-pink-600 text-white px-4 py-2 rounded-full font-bold hover:scale-105 cursor-pointer transform transition-all duration-200 hover:shadow-2xl shadow-lg border-2 border-white border-opacity-20 group-hover:border-opacity-40"
+                            >
+                                X
+                            </button>
+                        </div>
+                    ))}
+                </div>
+
+                <div className="flex gap-4 justify-center mt-6">
+                    <Button
+                        onClick={onClose}
+                        className="bg-linear-to-r from-red-500 to-red-600 text-white"
+                    >
+                        Cancelar
+                    </Button>
+                    <Button
+                        onClick={handleSave}
+                        className="bg-linear-to-r  from-green-300 to-green-800 text-white"
+                    >
+                        Salvar
+                    </Button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+export function ViewList() {
     interface Lista {
         _id: string;
         nome: string;
@@ -254,7 +390,9 @@ export function ViewList() {
 
     const [modalListaAberto, setModalListaAberto] = useState(false);
     const [modalCriarAberto, setModalCriarAberto] = useState(false);
+    const [modalEditarAberto, setModalEditarAberto] = useState(false);
     const [listaSelecionada, setListaSelecionada] = useState<Lista | null>(null);
+    const [listaParaEditar, setListaParaEditar] = useState<Lista | null>(null);
 
     const CarregarListas = async () => {
         try {
@@ -270,7 +408,7 @@ export function ViewList() {
 
     const DeletarLista = async (id: string, e: React.MouseEvent) => {
         e.stopPropagation()
-        
+
         try {
             await api.delete(`/lists/${id}`);
             setListas(listas.filter(l => l._id !== id));
@@ -280,6 +418,31 @@ export function ViewList() {
             toast.error("Erro ao deletar lista!");
         }
     }
+    // DEPOIS da função DeletarLista, adicione:
+
+    const abrirModalEditar = (lista: Lista, e: React.MouseEvent) => {
+        e.stopPropagation(); // ⬅️ IMPORTANTE: não abre o modal de visualização
+        setListaParaEditar(lista);
+        setModalEditarAberto(true);
+    };
+
+    const fecharModalEditar = () => {
+        setModalEditarAberto(false);
+        setListaParaEditar(null);
+    };
+
+    const salvarEdicaoLista = async (id: string, updates: any) => {
+        try {
+            await api.put(`/lists/${id}`, updates);
+            // Atualiza a lista local
+            setListas(listas.map(l => l._id === id ? { ...l, ...updates } : l));
+            toast.success("Lista atualizada com sucesso!");
+            fecharModalEditar();
+        } catch (error) {
+            toast.error("Erro ao atualizar lista!");
+            throw error;
+        }
+    };
 
     const abrirModalLista = (lista: Lista) => {
         setListaSelecionada(lista);
@@ -299,7 +462,7 @@ export function ViewList() {
         setModalCriarAberto(false);
     }
 
-    return(
+    return (
         <div className="flex flex-col items-center text-center bg-linear-to-br from-blue-400 via-blue-500 to-indigo-600 sm:w-[70vw] w-[95vw] min-h-[80vh] rounded-3xl p-8 gap-8 mt-8 shadow-2xl border-2 border-white border-opacity-20">
             <div className="bg-white bg-opacity-20 backdrop-blur-sm rounded-3xl p-8 border-2 border-white border-opacity-30 w-full">
                 <h1 className="text-4xl sm:text-5xl font-bold text-blue-700 drop-shadow-2xl mb-4">
@@ -308,16 +471,16 @@ export function ViewList() {
                 <p className="text-blue-400 text-lg sm:text-xl mb-6">
                     Organize suas tarefas de forma simples e eficiente
                 </p>
-                
+
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <Button 
+                    <Button
                         onClick={CarregarListas}
                         className="bg-linear-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 border-2 border-white border-opacity-20"
                     >
                         Carregar Listas
                     </Button>
-                    <Button 
-                        onClick={abrirModalCriar} 
+                    <Button
+                        onClick={abrirModalCriar}
                         className="bg-linear-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 border-2 border-white border-opacity-20"
                     >
                         Criar Nova Lista
@@ -334,9 +497,9 @@ export function ViewList() {
                     </div>
                 ) : (
                     listas.map((lista) => (
-                        <div 
-                            key={lista._id} 
-                            className="flex flex-col xl:flex-row justify-between items-start bg-white bg-opacity-95 backdrop-blur-sm p-6 rounded-3xl border-2 border-white border-opacity-30 transition-all duration-300 hover:scale-105 hover:shadow-2xl shadow-lg cursor-pointer group"
+                        <div
+                            key={lista._id}
+                            className="flex flex-col xl:flex-row justify-between items-start bg-white bg-opacity-95 backdrop-blur-sm p-6 rounded-3xl border-2 border-white border-opacity-30 transition-all duration-300 hover:scale-101 hover:shadow-2xl shadow-lg group"
                             onClick={() => abrirModalLista(lista)}
                         >
                             <div className="flex flex-col w-full xl:w-4/5 gap-3">
@@ -350,11 +513,18 @@ export function ViewList() {
                             </div>
 
                             <div className="flex flex-col gap-3 mt-4 xl:mt-0 xl:ml-4">
-                                <button 
-                                    className="bg-linear-to-r from-red-500 to-pink-600 text-white px-4 py-2 rounded-full font-bold hover:scale-110 transform transition-all duration-200 hover:shadow-2xl shadow-lg border-2 border-white border-opacity-20 group-hover:border-opacity-40"
+                                <button
+                                    className="bg-linear-to-r from-red-500 to-pink-600 text-white px-4 py-2 rounded-full font-bold hover:scale-105 cursor-pointer transform transition-all duration-200 hover:shadow-2xl shadow-lg border-2 border-white border-opacity-20 group-hover:border-opacity-40"
                                     onClick={(e) => DeletarLista(lista._id, e)}
                                 >
                                     X
+                                </button>
+                                {/* ⬇️ BOTÃO DE EDITAR - ADICIONE AQUI ⬇️ */}
+                                <button
+                                    className="bg-linear-to-r from-blue-500 to-indigo-600 text-white px-4 py-2 rounded-full font-bold hover:scale-105 cursor-pointer transform transition-all duration-200 hover:shadow-2xl shadow-lg border-2 border-white border-opacity-20 group-hover:border-opacity-40"
+                                    onClick={(e) => abrirModalEditar(lista, e)}
+                                >
+                                    ✏️
                                 </button>
                             </div>
                         </div>
@@ -362,27 +532,42 @@ export function ViewList() {
                 )}
             </div>
 
+
             {/* MODAL PARA VER DETALHES DA LISTA */}
-            <Modal 
-                isOpen={modalListaAberto} 
+            <Modal
+                isOpen={modalListaAberto}
                 onClose={fecharModalLista}
                 mode="ver"
             >
                 {listaSelecionada && (
-                    <ConteudoVerLista 
-                        lista={listaSelecionada} 
-                        onClose={fecharModalLista} 
+                    <ConteudoVerLista
+                        lista={listaSelecionada}
+                        onClose={fecharModalLista}
                     />
                 )}
             </Modal>
 
             {/* MODAL PARA CRIAR NOVA LISTA */}
-            <Modal 
-                isOpen={modalCriarAberto} 
+            <Modal
+                isOpen={modalCriarAberto}
                 onClose={fecharModalCriar}
                 mode="criar"
             >
                 <ConteudoCriarLista onClose={fecharModalCriar} />
+            </Modal>
+
+            <Modal
+                isOpen={modalEditarAberto}
+                onClose={fecharModalEditar}
+                mode="criar"
+            >
+                {listaParaEditar && (
+                    <ConteudoEditarLista
+                        lista={listaParaEditar}
+                        onClose={fecharModalEditar}
+                        onSave={salvarEdicaoLista}
+                    />
+                )}
             </Modal>
         </div>
     );
