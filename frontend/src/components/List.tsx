@@ -191,19 +191,60 @@ function ConteudoCriarLista({ onClose }: { onClose: () => void }) {
 }
 
 function ConteudoVerLista({ lista, onClose }: { lista: any, onClose: () => void }) {
+    // ⬇️ ADICIONE ESTE ESTADO PARA CONTROLAR AS TAREFAS VISUALMENTE
+    const [tarefasLocais, setTarefasLocais] = useState(lista.tarefas);
 
-    const [tarefasConcluidas, setTarefasConcluidas] = useState<boolean[]>(
-        new Array(lista.tarefas.length).fill(false)
-    );
-
-    const toggleTarefa = (index: number) => {
-        setTarefasConcluidas(prev => {
-            const novasTarefas = [...prev];
-            novasTarefas[index] = !novasTarefas[index];
-            return novasTarefas;
-        });
+    const toggleTarefa = async (index: number) => {
+        try {
+            const tarefasAtualizadas = tarefasLocais.map((t: any, i: number) => {
+                if (i === index) {
+                    if (typeof t === 'object' && t.texto) {
+                        return { ...t, concluida: !t.concluida };
+                    }
+                    return { texto: t, concluida: true };
+                }
+                if (typeof t === 'string') {
+                    return { texto: t, concluida: false };
+                }
+                return t;
+            });
+            
+            // ⬇️ ATUALIZA VISUALMENTE PRIMEIRO
+            setTarefasLocais(tarefasAtualizadas);
+            
+            // ⬇️ SALVA NO BACKEND E USA A RESPOSTA
+            const response = await api.put(`/lists/${lista._id}`, {
+                nome: lista.nome,
+                descricao: lista.descricao,
+                tarefas: tarefasAtualizadas
+            });
+            
+            // ⬇️ ATUALIZA COM OS DADOS REAIS DO BACKEND
+            setTarefasLocais(response.data.tarefas);
+            
+            toast.success("Tarefa atualizada!");
+        } catch (error) {
+            console.error("Erro ao atualizar tarefa:", error);
+            toast.error("Erro ao atualizar tarefa");
+            // ⬇️ REVERTE SE DEU ERRO
+            setTarefasLocais(lista.tarefas);
+        }
     };
 
+    const getTarefaInfo = (tarefa: any) => {
+        // Se for objeto novo
+        if (typeof tarefa === 'object' && tarefa.texto) {
+            return {
+                texto: tarefa.texto,
+                concluida: tarefa.concluida || false
+            };
+        }
+        // Se for string antiga
+        return {
+            texto: tarefa,
+            concluida: false
+        };
+    };
 
     return (
         <div className="text-center">
@@ -219,36 +260,41 @@ function ConteudoVerLista({ lista, onClose }: { lista: any, onClose: () => void 
 
                 <div className="bg-linear-to-br from-white to-gray-50 p-6 rounded-2xl border-2 border-emerald-200 shadow-lg">
                     <h3 className="text-xl font-semibold text-emerald-700 mb-6 bg-emerald-50 py-3 rounded-xl border border-emerald-200">
-                        📝 Tarefas ({lista.tarefas.length})
+                        📝 Tarefas ({tarefasLocais.length})
                     </h3>
 
-                    {lista.tarefas.length === 0 ? (
+                    {tarefasLocais.length === 0 ? (
                         <p className="text-gray-500 italic py-6 bg-gray-50 rounded-xl border border-gray-200">
                             Nenhuma tarefa nesta lista
                         </p>
                     ) : (
                         <ul className="space-y-4 text-left">
-                            {lista.tarefas.map((tarefa: string, index: number) => (
-                                <li key={index} className="flex items-center gap-4 py-3 px-4 bg-white rounded-xl border border-emerald-100 shadow-sm hover:shadow-md transition-all duration-200 group">
-                                    {/* To marcando onde tá o botão de concluir tarefa pra caso de merda dps */}
-                                    <button
-                                        onClick={() => toggleTarefa(index)}
-                                        className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all duration-200 hover:scale-110 ${tarefasConcluidas[index]
-                                            ? 'bg-green-500 border-green-500 text-white'
-                                            : 'border-gray-300 hover:border-green-400'
+                            {tarefasLocais.map((tarefa: any, index: number) => {
+                                const tarefaInfo = getTarefaInfo(tarefa);
+                                
+                                return (
+                                    <li key={index} className="flex items-center gap-4 py-3 px-4 bg-white rounded-xl border border-emerald-100 shadow-sm hover:shadow-md transition-all duration-200 group">
+                                        <button
+                                            onClick={() => toggleTarefa(index)}
+                                            className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all duration-200 hover:scale-110 ${
+                                                tarefaInfo.concluida
+                                                    ? 'bg-green-500 border-green-500 text-white'
+                                                    : 'border-gray-300 hover:border-green-400'
                                             }`}
-                                    >
-                                        {tarefasConcluidas[index] && '✓'}
-                                    </button>
+                                        >
+                                            {tarefaInfo.concluida && '✓'}
+                                        </button>
 
-                                    <span className={`text-lg font-medium transition-all duration-200 ${tarefasConcluidas[index]
-                                        ? 'line-through text-gray-500'
-                                        : 'text-gray-800'
+                                        <span className={`text-lg font-medium transition-all duration-200 ${
+                                            tarefaInfo.concluida
+                                                ? 'line-through text-gray-500'
+                                                : 'text-gray-800'
                                         }`}>
-                                        {tarefa}
-                                    </span>
-                                </li>
-                            ))}
+                                            {tarefaInfo.texto}
+                                        </span>
+                                    </li>
+                                );
+                            })}
                         </ul>
                     )}
                 </div>
@@ -274,11 +320,17 @@ function ConteudoEditarLista({ lista, onClose, onSave }: { lista: any, onClose: 
 
     const handleSave = async () => {
         try {
-            await onSave(lista._id, { nome, descricao, tarefa });
+            console.log("Enviando dados:", { nome, descricao, tarefa });
+            await onSave(lista._id, {
+                nome,
+                descricao,
+                tarefas: tarefa,
+            });
             onClose();
             toast.success("Lista atualizada com sucesso");
         }
         catch (error) {
+            console.error("Erro detalhado:", error);
             toast.error("Erro ao atualizar lista");
         }
     }
@@ -287,7 +339,7 @@ function ConteudoEditarLista({ lista, onClose, onSave }: { lista: any, onClose: 
         if (novaTarefa.trim() === "") return;
         setTarefa([...tarefa, novaTarefa]);
         setNovaTarefa("");
-    };
+    }
 
     const RemoverTarefa = (index: number) => {
         setTarefa(tarefa.filter((_, i) => i !== index));
@@ -418,10 +470,9 @@ export function ViewList() {
             toast.error("Erro ao deletar lista!");
         }
     }
-    // DEPOIS da função DeletarLista, adicione:
 
     const abrirModalEditar = (lista: Lista, e: React.MouseEvent) => {
-        e.stopPropagation(); // ⬅️ IMPORTANTE: não abre o modal de visualização
+        e.stopPropagation();
         setListaParaEditar(lista);
         setModalEditarAberto(true);
     };
@@ -519,7 +570,6 @@ export function ViewList() {
                                 >
                                     X
                                 </button>
-                                {/* ⬇️ BOTÃO DE EDITAR - ADICIONE AQUI ⬇️ */}
                                 <button
                                     className="bg-linear-to-r from-blue-500 to-indigo-600 text-white px-4 py-2 rounded-full font-bold hover:scale-105 cursor-pointer transform transition-all duration-200 hover:shadow-2xl shadow-lg border-2 border-white border-opacity-20 group-hover:border-opacity-40"
                                     onClick={(e) => abrirModalEditar(lista, e)}
@@ -556,6 +606,7 @@ export function ViewList() {
                 <ConteudoCriarLista onClose={fecharModalCriar} />
             </Modal>
 
+            {/* MODAL PARA EDITAR A LISTA */}
             <Modal
                 isOpen={modalEditarAberto}
                 onClose={fecharModalEditar}

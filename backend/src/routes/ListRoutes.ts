@@ -8,22 +8,18 @@ listRouter.post("/", async (req: Request, res: Response) => {
     try {
         const { nome, descricao, tarefas, userEmail } = req.body;
 
-        console.log("Dados recebidos:", { nome, descricao, tarefas, userEmail });
-
-        if (!nome || !userEmail) {
-            return res.status(400).json({ 
-                message: "Nome e userEmail são obrigatórios" 
-            });
-        }
+        const tarefasFormatadas = (tarefas || []).map((texto: string) => ({
+            texto,
+            concluida: false
+        }));
 
         const lista = await List.create({ 
             nome, 
             descricao, 
-            tarefas: tarefas || [],
+            tarefas: tarefasFormatadas,
             userEmail 
         });
         
-        console.log("Lista criada:", lista);
         return res.status(201).json({
             message: "Lista criada com sucesso",
         });
@@ -91,5 +87,4 @@ listRouter.put('/:id', async (req, res) => {
         res.status(500).json({ error: 'Erro ao atualizar lista' });
     }
 });
-
 export default listRouter;

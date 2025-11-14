@@ -5,7 +5,7 @@ export interface IList extends Document {
     descricao?: string;
     tarefas: Array<{
         texto: string;
-        completed: boolean;
+        concluida: boolean;
     }>;
     userEmail: string;
     createdAt: Date;
@@ -22,7 +22,14 @@ const ListSchema = new mongoose.Schema({
         default: ""
     },
     tarefas: [{
-        type: String
+        texto: {
+            type: String,
+            required: true
+        },
+        concluida: {
+            type: Boolean,
+            default: false
+        }
     }],
     userEmail: {
         type: String,
