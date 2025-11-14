@@ -6,15 +6,18 @@ import connectDB from "./config/database";
 
 //const port = 3000
 const app = express();
+
 app.use(cors({
   origin: ["http://localhost:5173", "https://to-do-list-goken.vercel.app"],
-  methods: ["GET", "POST", "PUT", "DELETE"],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   credentials: true,
-  allowedHeaders: ["Content-Type", "Authorization"]
+  allowedHeaders: ["Content-Type", "Authorization", "x-requested-with"],
 }));
 app.use(express.json());
 
 connectDB();
+
+app.options("*", cors());
 
 app.use("/users", userRoutes);
 app.use("/lists", listRoutes);
