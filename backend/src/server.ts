@@ -17,8 +17,6 @@ app.use(express.json());
 
 connectDB();
 
-app.options("*", cors());
-
 app.use("/users", userRoutes);
 app.use("/lists", listRoutes);
 
