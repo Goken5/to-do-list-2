@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from 'react-toastify';
 import { api } from "../services/ApiService";
 import { Input, Button } from "./Input";
@@ -57,7 +57,7 @@ function Modal({ isOpen, onClose, children, mode }: ModalProps) {
     );
 }
 
-function ConteudoCriarLista({ onClose }: { onClose: () => void }) {
+function ConteudoCriarLista({ onClose, onListaCriada }: { onClose: () => void, onListaCriada?: () => void }) {
     const [nome, setNome] = useState("");
     const [descricao, setDescricao] = useState("");
     const [tarefa, setTarefa] = useState<string[]>([]);
@@ -73,19 +73,25 @@ function ConteudoCriarLista({ onClose }: { onClose: () => void }) {
         }
 
         try {
-            const data = await api.post("/lists", {
+            await api.post("/lists", {
                 nome: nome.trim(),
                 descricao: descricao.trim(),
                 tarefas: tarefa,
                 userEmail,
             });
-            console.log(data);
+            
             toast.success("🎉 Lista Criada com Sucesso!");
 
             setNome("");
             setDescricao("");
             setTarefa([]);
             setNovaTarefa("");
+            
+            //Faz Callback pra atualizar as listas
+            if (onListaCriada) {
+                onListaCriada();
+            }
+            
             onClose();
 
         } catch (error) {
@@ -190,8 +196,11 @@ function ConteudoCriarLista({ onClose }: { onClose: () => void }) {
     );
 }
 
-function ConteudoVerLista({ lista, onClose }: { lista: any, onClose: () => void }) {
-    // ⬇️ ADICIONE ESTE ESTADO PARA CONTROLAR AS TAREFAS VISUALMENTE
+function ConteudoVerLista({ lista, onClose, onListaAtualizada }: { 
+    lista: any, 
+    onClose: () => void,
+    onListaAtualizada?: (listaAtualizada: any) => void 
+}) {
     const [tarefasLocais, setTarefasLocais] = useState(lista.tarefas);
 
     const toggleTarefa = async (index: number) => {
@@ -208,38 +217,39 @@ function ConteudoVerLista({ lista, onClose }: { lista: any, onClose: () => void 
                 }
                 return t;
             });
-            
-            // ⬇️ ATUALIZA VISUALMENTE PRIMEIRO
+
             setTarefasLocais(tarefasAtualizadas);
-            
-            // ⬇️ SALVA NO BACKEND E USA A RESPOSTA
+
             const response = await api.put(`/lists/${lista._id}`, {
                 nome: lista.nome,
                 descricao: lista.descricao,
                 tarefas: tarefasAtualizadas
             });
-            
-            // ⬇️ ATUALIZA COM OS DADOS REAIS DO BACKEND
-            setTarefasLocais(response.data.tarefas);
-            
-            toast.success("Tarefa atualizada!");
+
+            //Atualiza a lista no componente pai
+            if (onListaAtualizada) {
+                onListaAtualizada(response.data);
+            }
+
+            toast.success("Tarefa salva!");
         } catch (error) {
             console.error("Erro ao atualizar tarefa:", error);
-            toast.error("Erro ao atualizar tarefa");
-            // ⬇️ REVERTE SE DEU ERRO
+            toast.error("Erro ao salvar tarefa");
             setTarefasLocais(lista.tarefas);
         }
     };
 
+    const handleClose = () => {
+        onClose();
+    };
+
     const getTarefaInfo = (tarefa: any) => {
-        // Se for objeto novo
         if (typeof tarefa === 'object' && tarefa.texto) {
             return {
                 texto: tarefa.texto,
                 concluida: tarefa.concluida || false
             };
         }
-        // Se for string antiga
         return {
             texto: tarefa,
             concluida: false
@@ -271,25 +281,23 @@ function ConteudoVerLista({ lista, onClose }: { lista: any, onClose: () => void 
                         <ul className="space-y-4 text-left">
                             {tarefasLocais.map((tarefa: any, index: number) => {
                                 const tarefaInfo = getTarefaInfo(tarefa);
-                                
+
                                 return (
                                     <li key={index} className="flex items-center gap-4 py-3 px-4 bg-white rounded-xl border border-emerald-100 shadow-sm hover:shadow-md transition-all duration-200 group">
                                         <button
                                             onClick={() => toggleTarefa(index)}
-                                            className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all duration-200 hover:scale-110 ${
-                                                tarefaInfo.concluida
+                                            className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all duration-200 hover:scale-110 ${tarefaInfo.concluida
                                                     ? 'bg-green-500 border-green-500 text-white'
                                                     : 'border-gray-300 hover:border-green-400'
-                                            }`}
+                                                }`}
                                         >
                                             {tarefaInfo.concluida && '✓'}
                                         </button>
 
-                                        <span className={`text-lg font-medium transition-all duration-200 ${
-                                            tarefaInfo.concluida
+                                        <span className={`text-lg font-medium transition-all duration-200 ${tarefaInfo.concluida
                                                 ? 'line-through text-gray-500'
                                                 : 'text-gray-800'
-                                        }`}>
+                                            }`}>
                                             {tarefaInfo.texto}
                                         </span>
                                     </li>
@@ -301,7 +309,7 @@ function ConteudoVerLista({ lista, onClose }: { lista: any, onClose: () => void 
 
                 <div className="flex gap-4 mt-8 flex-col sm:flex-row">
                     <Button
-                        onClick={onClose}
+                        onClick={handleClose}
                         className="bg-linear-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
                     >
                         ← Voltar
@@ -446,12 +454,18 @@ export function ViewList() {
     const [listaSelecionada, setListaSelecionada] = useState<Lista | null>(null);
     const [listaParaEditar, setListaParaEditar] = useState<Lista | null>(null);
 
+    //Carrega listas automaticamente, sem precisar apertar o botão
+    useEffect(() => {
+        if (userEmail) {
+            CarregarListas();
+        }
+    }, [userEmail]);
+
     const CarregarListas = async () => {
         try {
             const response = await api.get(`/lists?userEmail=${userEmail}`);
             console.log("Listas carregadas:", response.data);
             setListas(response.data);
-            toast.success("Listas carregadas com sucesso!");
         } catch (error) {
             console.error("Erro ao carregar listas:", error);
             toast.error("Erro ao carregar listas!");
@@ -513,6 +527,15 @@ export function ViewList() {
         setModalCriarAberto(false);
     }
 
+    //Função para atualizar uma lista específica
+    const atualizarLista = (listaAtualizada: any) => {
+        setListas(prevListas =>
+            prevListas.map(l =>
+                l._id === listaAtualizada._id ? listaAtualizada : l
+            )
+        );
+    };
+
     return (
         <div className="flex flex-col items-center text-center bg-linear-to-br from-blue-400 via-blue-500 to-indigo-600 sm:w-[70vw] w-[95vw] min-h-[80vh] rounded-3xl p-8 gap-8 mt-8 shadow-2xl border-2 border-white border-opacity-20">
             <div className="bg-white bg-opacity-20 backdrop-blur-sm rounded-3xl p-8 border-2 border-white border-opacity-30 w-full">
@@ -528,7 +551,7 @@ export function ViewList() {
                         onClick={CarregarListas}
                         className="bg-linear-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 border-2 border-white border-opacity-20"
                     >
-                        Carregar Listas
+                        Atualizar Listas
                     </Button>
                     <Button
                         onClick={abrirModalCriar}
@@ -582,7 +605,6 @@ export function ViewList() {
                 )}
             </div>
 
-
             {/* MODAL PARA VER DETALHES DA LISTA */}
             <Modal
                 isOpen={modalListaAberto}
@@ -593,6 +615,7 @@ export function ViewList() {
                     <ConteudoVerLista
                         lista={listaSelecionada}
                         onClose={fecharModalLista}
+                        onListaAtualizada={atualizarLista}
                     />
                 )}
             </Modal>
@@ -603,7 +626,10 @@ export function ViewList() {
                 onClose={fecharModalCriar}
                 mode="criar"
             >
-                <ConteudoCriarLista onClose={fecharModalCriar} />
+                <ConteudoCriarLista 
+                    onClose={fecharModalCriar} 
+                    onListaCriada={CarregarListas}
+                />
             </Modal>
 
             {/* MODAL PARA EDITAR A LISTA */}
