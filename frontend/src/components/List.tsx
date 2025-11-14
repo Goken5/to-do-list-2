@@ -3,7 +3,7 @@ import { toast } from 'react-toastify';
 import { api } from "../services/ApiService";
 import { Input, Button } from "./Input";
 
-type ModalMode = "criar" | "ver";
+type ModalMode = "criar" | "ver" | "editar";
 
 interface ModalProps {
     isOpen: boolean;
@@ -27,6 +27,12 @@ function Modal({ isOpen, onClose, children, mode }: ModalProps) {
             title: "text-white",
             border: "border-emerald-200 shadow-2xl",
             gradient: "from-emerald-50 to-teal-50"
+        },
+        editar: {
+            header: "bg-gradient-to-r from-cyan-500 to-cyan-700",
+            title: "text-white",
+            border: "border-cyan-200 shadow-2xl",
+            gradient: "from-cyan-50 to-cyan-100"
         }
     };
 
@@ -38,7 +44,7 @@ function Modal({ isOpen, onClose, children, mode }: ModalProps) {
                 <div className={`${currentStyle.header} rounded-t-2xl p-6 shadow-lg`}>
                     <div className="flex justify-between items-center">
                         <h2 className="text-2xl font-bold text-white drop-shadow-md">
-                            {mode === "criar" ? "Criar Nova Lista" : "Detalhes da Lista"}
+                            {mode === "criar" ? "Criar Nova Lista" : mode === "ver" ? "Detalhes da Lista" : "Editar Lista"}
                         </h2>
                         <button
                             onClick={onClose}
@@ -79,19 +85,19 @@ function ConteudoCriarLista({ onClose, onListaCriada }: { onClose: () => void, o
                 tarefas: tarefa,
                 userEmail,
             });
-            
+
             toast.success("🎉 Lista Criada com Sucesso!");
 
             setNome("");
             setDescricao("");
             setTarefa([]);
             setNovaTarefa("");
-            
+
             //Faz Callback pra atualizar as listas
             if (onListaCriada) {
                 onListaCriada();
             }
-            
+
             onClose();
 
         } catch (error) {
@@ -196,10 +202,10 @@ function ConteudoCriarLista({ onClose, onListaCriada }: { onClose: () => void, o
     );
 }
 
-function ConteudoVerLista({ lista, onClose, onListaAtualizada }: { 
-    lista: any, 
+function ConteudoVerLista({ lista, onClose, onListaAtualizada }: {
+    lista: any,
     onClose: () => void,
-    onListaAtualizada?: (listaAtualizada: any) => void 
+    onListaAtualizada?: (listaAtualizada: any) => void
 }) {
     const [tarefasLocais, setTarefasLocais] = useState(lista.tarefas);
 
@@ -287,16 +293,16 @@ function ConteudoVerLista({ lista, onClose, onListaAtualizada }: {
                                         <button
                                             onClick={() => toggleTarefa(index)}
                                             className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all duration-200 hover:scale-110 ${tarefaInfo.concluida
-                                                    ? 'bg-green-500 border-green-500 text-white'
-                                                    : 'border-gray-300 hover:border-green-400'
+                                                ? 'bg-green-500 border-green-500 text-white'
+                                                : 'border-gray-300 hover:border-green-400'
                                                 }`}
                                         >
                                             {tarefaInfo.concluida && '✓'}
                                         </button>
 
                                         <span className={`text-lg font-medium transition-all duration-200 ${tarefaInfo.concluida
-                                                ? 'line-through text-gray-500'
-                                                : 'text-gray-800'
+                                            ? 'line-through text-gray-500'
+                                            : 'text-gray-800'
                                             }`}>
                                             {tarefaInfo.texto}
                                         </span>
@@ -323,41 +329,62 @@ function ConteudoVerLista({ lista, onClose, onListaAtualizada }: {
 function ConteudoEditarLista({ lista, onClose, onSave }: { lista: any, onClose: () => void, onSave: (id: string, updates: any) => void }) {
     const [nome, setNome] = useState(lista.nome);
     const [descricao, setDescricao] = useState(lista.descricao);
-    const [tarefa, setTarefa] = useState<string[]>(lista.tarefas);
+    const [tarefas, setTarefas] = useState<string[]>([]);
     const [novaTarefa, setNovaTarefa] = useState("");
+
+    // Inicializar tarefas corretamente
+    useEffect(() => {
+        const tarefasFormatadas = lista.tarefas.map((t: any) => {
+            if (typeof t === 'object' && t.texto) {
+                return t.texto; // Pega apenas o texto para edição
+            }
+            return t; // Já é string
+        });
+        setTarefas(tarefasFormatadas);
+    }, [lista.tarefas]);
 
     const handleSave = async () => {
         try {
-            console.log("Enviando dados:", { nome, descricao, tarefa });
+            console.log("Tarefas antes de salvar:", tarefas);
+
             await onSave(lista._id, {
-                nome,
-                descricao,
-                tarefas: tarefa,
+                nome: nome.trim(),
+                descricao: descricao.trim(),
+                tarefas: tarefas.filter(t => t.trim() !== ""), // Remove tarefas vazias
             });
-            onClose();
+
             toast.success("Lista atualizada com sucesso");
         }
         catch (error) {
-            console.error("Erro detalhado:", error);
+            console.error("Erro ao salvar:", error);
             toast.error("Erro ao atualizar lista");
+            throw error; // Propaga o erro para o componente pai
         }
     }
 
     const AdicionarTarefa = () => {
         if (novaTarefa.trim() === "") return;
-        setTarefa([...tarefa, novaTarefa]);
+        setTarefas([...tarefas, novaTarefa.trim()]);
         setNovaTarefa("");
     }
 
     const RemoverTarefa = (index: number) => {
-        setTarefa(tarefa.filter((_, i) => i !== index));
+        setTarefas(tarefas.filter((_, i) => i !== index));
     }
 
     const EditarTarefa = (index: number, novoTexto: string) => {
-        const novaTarefa = [...tarefa];
-        novaTarefa[index] = novoTexto;
-        setTarefa(novaTarefa);
+        const novasTarefas = [...tarefas];
+        novasTarefas[index] = novoTexto;
+        setTarefas(novasTarefas);
     }
+
+    // Adicione esta função para lidar com Enter no input
+    const handleKeyPress = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter') {
+            AdicionarTarefa();
+        }
+    }
+
     return (
         <div className="text-center">
             <h1 className="text-3xl sm:text-4xl font-bold bg-linear-to-r from-cyan-300 to-cyan-800 bg-clip-text text-transparent mb-8">
@@ -381,51 +408,67 @@ function ConteudoEditarLista({ lista, onClose, onSave }: { lista: any, onClose: 
                     className="border-2 border-cyan-200 focus:border-cyan-500"
                 />
 
-                <div className="flex gap-3 items-center">
+                <div className="flex w-full gap-3 items-center mt-4">
                     <Input
                         type="text"
-                        placeholder="Nova tarefa..."
+                        placeholder="Digite uma nova tarefa..."
                         value={novaTarefa}
                         onChange={(e) => setNovaTarefa(e.target.value)}
-                        className="border-2 border-cyan-200 focus:border-cyan-500"
+                        onKeyPress={handleKeyPress}
+                        className="border-2 border-cyan-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 transition-all duration-300 flex-1"
                     />
-                    <Button
+                    {/*Tive que usar um botão normal pq por algum motivo o componente tava ficando bizarramente grande*/}
+                    <button
+                        type="button"
                         onClick={AdicionarTarefa}
-                        className="bg-linear-to-r from-green-500 to-emerald-600 text-white"
+                        className="bg-cyan-500 hover:bg-cyan-600 text-white font-medium px-4 py-2 hover:scale-110 cursor-pointer rounded-lg transition-all duration-200 whitespace-nowrap text-sm min-w-[100px]"
                     >
-                        +
-                    </Button>
+                        Adicionar
+                    </button>
                 </div>
 
-                <div className="max-h-60 overflow-y-auto space-y-2">
-                    {tarefa.map((tarefa, index) => (
-                        <div key={index} className="flex gap-2 items-center bg-purple-50 p-3 rounded-lg">
-                            <Input
-                                type="text"
-                                value={tarefa}
-                                onChange={(e) => EditarTarefa(index, e.target.value)}
-                                className="border border-cyan-300 flex-1"
-                            />
-                            <button
-                                onClick={() => RemoverTarefa(index)}
-                                className="bg-linear-to-r from-red-500 to-pink-600 text-white px-4 py-2 rounded-full font-bold hover:scale-105 cursor-pointer transform transition-all duration-200 hover:shadow-2xl shadow-lg border-2 border-white border-opacity-20 group-hover:border-opacity-40"
-                            >
-                                X
-                            </button>
+                <div className="bg-cyan-50 p-4 rounded-xl border-2 border-cyan-200">
+                    <h3 className="text-lg font-semibold text-cyan-800 mb-3">
+                        📝 Tarefas da Lista ({tarefas.length})
+                    </h3>
+
+                    {tarefas.length === 0 ? (
+                        <p className="text-gray-500 italic py-4">
+                            Nenhuma tarefa adicionada
+                        </p>
+                    ) : (
+                        <div className="max-h-60 overflow-y-auto space-y-2">
+                            {tarefas.map((tarefa, index) => (
+                                <div key={index} className="flex gap-2 items-center bg-white p-3 rounded-lg border border-cyan-300">
+                                    <Input
+                                        type="text"
+                                        value={tarefa}
+                                        onChange={(e) => EditarTarefa(index, e.target.value)}
+                                        className="border border-cyan-300 flex-1"
+                                        placeholder="Digite a tarefa..."
+                                    />
+                                    <button
+                                        onClick={() => RemoverTarefa(index)}
+                                        className="bg-linear-to-r from-red-500 to-pink-600 text-white px-4 py-2 rounded-full font-bold hover:scale-105 cursor-pointer transform transition-all duration-200 hover:shadow-lg shadow-md"
+                                    >
+                                        X
+                                    </button>
+                                </div>
+                            ))}
                         </div>
-                    ))}
+                    )}
                 </div>
 
                 <div className="flex gap-4 justify-center mt-6">
                     <Button
                         onClick={onClose}
-                        className="bg-linear-to-r from-red-500 to-red-600 text-white"
+                        className="bg-linear-to-r from-gray-500 to-gray-600 text-white px-8"
                     >
                         Cancelar
                     </Button>
                     <Button
                         onClick={handleSave}
-                        className="bg-linear-to-r  from-green-300 to-green-800 text-white"
+                        className="bg-linear-to-r from-cyan-500 to-cyan-700 text-white px-8"
                     >
                         Salvar
                     </Button>
@@ -498,16 +541,32 @@ export function ViewList() {
 
     const salvarEdicaoLista = async (id: string, updates: any) => {
         try {
-            await api.put(`/lists/${id}`, updates);
+            // Garante que as tarefas estejam no formato correto
+            const dadosParaEnviar = {
+                ...updates,
+                tarefas: updates.tarefas.map((t: any) => {
+                    if (typeof t === 'string') {
+                        return { texto: t, concluida: false };
+                    }
+                    return t; // Já está no formato objeto
+                })
+            };
+
+            console.log("Dados enviados para servidor:", dadosParaEnviar);
+
+            await api.put(`/lists/${id}`, dadosParaEnviar);
+
             // Atualiza a lista local
             setListas(listas.map(l => l._id === id ? { ...l, ...updates } : l));
             toast.success("Lista atualizada com sucesso!");
             fecharModalEditar();
         } catch (error) {
+            console.error("Erro detalhado ao salvar:", error);
             toast.error("Erro ao atualizar lista!");
             throw error;
         }
     };
+
 
     const abrirModalLista = (lista: Lista) => {
         setListaSelecionada(lista);
@@ -626,8 +685,8 @@ export function ViewList() {
                 onClose={fecharModalCriar}
                 mode="criar"
             >
-                <ConteudoCriarLista 
-                    onClose={fecharModalCriar} 
+                <ConteudoCriarLista
+                    onClose={fecharModalCriar}
                     onListaCriada={CarregarListas}
                 />
             </Modal>
@@ -636,7 +695,7 @@ export function ViewList() {
             <Modal
                 isOpen={modalEditarAberto}
                 onClose={fecharModalEditar}
-                mode="criar"
+                mode="editar"
             >
                 {listaParaEditar && (
                     <ConteudoEditarLista
