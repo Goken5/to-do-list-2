@@ -78,7 +78,7 @@ listRouter.delete("/:id", async (req: Request, res: Response) => {
         });
     }
 });
-listRouter.put('/lists/:id', async (req, res) => {
+listRouter.put('/:id', async (req, res) => {
     try {
         const { nome, descricao, tarefas } = req.body;
         const lista = await List.findByIdAndUpdate(
